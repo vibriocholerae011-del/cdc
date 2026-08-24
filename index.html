@@ -1,0 +1,2305 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover"
+  >
+
+  <meta name="theme-color" content="#ffffff">
+
+  <title>کتابخانه دیجیتال نظام مراقبت بیماری‌ها</title>
+
+  <!-- Telegram Mini App API -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+  <!-- Vazirmatn -->
+  <link
+    rel="preconnect"
+    href="https://fonts.googleapis.com"
+  >
+
+  <link
+    rel="preconnect"
+    href="https://fonts.gstatic.com"
+    crossorigin
+  >
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  >
+
+  <style>
+
+    /* =========================================================
+       VARIABLES
+    ========================================================= */
+
+    :root {
+      --bg: #ffffff;
+      --text: #1f2937;
+      --hint: #6b7280;
+      --secondary: #f3f4f6;
+
+      --primary: #2481cc;
+      --primary-text: #ffffff;
+
+      --card: #ffffff;
+      --border: rgba(0, 0, 0, 0.07);
+
+      --shadow:
+        0 4px 18px rgba(0, 0, 0, 0.055);
+
+      --shadow-hover:
+        0 8px 28px rgba(0, 0, 0, 0.09);
+
+      --radius-xl: 22px;
+      --radius-lg: 18px;
+      --radius-md: 14px;
+      --radius-sm: 11px;
+    }
+
+
+    /* =========================================================
+       RESET
+    ========================================================= */
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+
+      min-width: 320px;
+      min-height: 100vh;
+      min-height: 100dvh;
+
+      background: var(--bg);
+      color: var(--text);
+
+      font-family:
+        "Vazirmatn",
+        Tahoma,
+        Arial,
+        sans-serif;
+
+      overflow-x: hidden;
+    }
+
+    button,
+    input {
+      font-family: inherit;
+    }
+
+    button {
+      border: 0;
+      outline: 0;
+      cursor: pointer;
+    }
+
+
+    /* =========================================================
+       APP CONTAINER
+    ========================================================= */
+
+    #app {
+      width: 100%;
+      min-height: 100vh;
+      min-height: 100dvh;
+
+      padding:
+        calc(14px + env(safe-area-inset-top))
+        16px
+        calc(28px + env(safe-area-inset-bottom));
+
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+
+    /* =========================================================
+       HEADER
+    ========================================================= */
+
+    .main-header {
+      margin-bottom: 18px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-icon {
+      width: 52px;
+      height: 52px;
+
+      flex-shrink: 0;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      background:
+        color-mix(
+          in srgb,
+          var(--primary) 13%,
+          transparent
+        );
+
+      border-radius: 17px;
+
+      font-size: 25px;
+    }
+
+    .brand-title {
+      margin: 0;
+
+      font-size: 19px;
+      line-height: 1.55;
+
+      font-weight: 800;
+
+      color: var(--text);
+    }
+
+    .brand-description {
+      margin: 5px 0 0;
+
+      font-size: 12px;
+      line-height: 1.8;
+
+      color: var(--hint);
+    }
+
+
+    /* =========================================================
+       SEARCH
+    ========================================================= */
+
+    .search-box {
+      position: relative;
+
+      width: 100%;
+
+      margin: 18px 0 22px;
+    }
+
+    .search-input {
+      width: 100%;
+      height: 52px;
+
+      padding:
+        0
+        45px
+        0
+        16px;
+
+      background: var(--secondary);
+
+      color: var(--text);
+
+      border: 1px solid transparent;
+      border-radius: 15px;
+
+      font-size: 14px;
+
+      outline: none;
+
+      transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+    }
+
+    .search-input::placeholder {
+      color: var(--hint);
+    }
+
+    .search-input:focus {
+      border-color:
+        color-mix(
+          in srgb,
+          var(--primary) 50%,
+          transparent
+        );
+
+      box-shadow:
+        0 0 0 3px
+        color-mix(
+          in srgb,
+          var(--primary) 10%,
+          transparent
+        );
+    }
+
+    .search-icon {
+      position: absolute;
+
+      right: 15px;
+      top: 50%;
+
+      transform: translateY(-50%);
+
+      font-size: 18px;
+
+      pointer-events: none;
+
+      opacity: 0.65;
+    }
+
+
+    /* =========================================================
+       SECTION TITLE
+    ========================================================= */
+
+    .section-title {
+      margin:
+        0
+        0
+        12px
+        2px;
+
+      color: var(--hint);
+
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+
+    /* =========================================================
+       CATEGORY GRID
+    ========================================================= */
+
+    .categories {
+      display: grid;
+
+      grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+      gap: 11px;
+    }
+
+    .category-card {
+      min-height: 158px;
+
+      padding: 15px;
+
+      display: flex;
+      flex-direction: column;
+
+      justify-content: space-between;
+
+      text-align: right;
+
+      background: var(--card);
+
+      color: var(--text);
+
+      border:
+        1px solid var(--border);
+
+      border-radius:
+        var(--radius-lg);
+
+      box-shadow: var(--shadow);
+
+      transition:
+        transform 0.15s ease,
+        box-shadow 0.15s ease;
+
+      animation:
+        fadeInUp 0.3s ease both;
+    }
+
+    .category-card:hover {
+      box-shadow: var(--shadow-hover);
+    }
+
+    .category-card:active {
+      transform: scale(0.97);
+    }
+
+    .category-icon {
+      width: 45px;
+      height: 45px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      background:
+        color-mix(
+          in srgb,
+          var(--primary) 12%,
+          transparent
+        );
+
+      border-radius: 14px;
+
+      font-size: 23px;
+    }
+
+    .category-name {
+      margin-top: 12px;
+
+      font-size: 13px;
+      line-height: 1.8;
+
+      font-weight: 700;
+    }
+
+    .category-count {
+      margin-top: 3px;
+
+      font-size: 11px;
+
+      color: var(--hint);
+    }
+
+
+    /* =========================================================
+       INTERNAL HEADER / BACK BUTTON
+    ========================================================= */
+
+    .internal-header {
+      display: flex;
+
+      align-items: center;
+
+      gap: 10px;
+
+      margin-bottom: 17px;
+    }
+
+    .back-button {
+      height: 43px;
+
+      display: inline-flex;
+
+      align-items: center;
+      justify-content: center;
+
+      gap: 7px;
+
+      padding:
+        0
+        14px;
+
+      background: var(--secondary);
+
+      color: var(--text);
+
+      border:
+        1px solid var(--border);
+
+      border-radius: 13px;
+
+      font-size: 13px;
+
+      font-weight: 600;
+
+      transition:
+        transform 0.15s ease,
+        background 0.15s ease;
+    }
+
+    .back-button:active {
+      transform: scale(0.95);
+    }
+
+    .back-arrow {
+      font-size: 20px;
+
+      line-height: 1;
+    }
+
+
+    /* =========================================================
+       PAGE TITLE
+    ========================================================= */
+
+    .page-title {
+      margin-bottom: 18px;
+
+      animation:
+        fadeInUp 0.25s ease both;
+    }
+
+    .page-title h2 {
+      margin: 0;
+
+      font-size: 21px;
+
+      line-height: 1.65;
+
+      font-weight: 800;
+    }
+
+    .page-subtitle {
+      margin: 4px 0 0;
+
+      font-size: 12px;
+
+      color: var(--hint);
+    }
+
+
+    /* =========================================================
+       DISEASE LIST
+    ========================================================= */
+
+    .disease-list {
+      display: flex;
+
+      flex-direction: column;
+
+      gap: 9px;
+    }
+
+    .disease-item {
+      width: 100%;
+
+      min-height: 69px;
+
+      padding:
+        10px
+        13px;
+
+      display: flex;
+
+      align-items: center;
+
+      gap: 11px;
+
+      text-align: right;
+
+      color: var(--text);
+
+      background: var(--card);
+
+      border:
+        1px solid var(--border);
+
+      border-radius:
+        var(--radius-md);
+
+      box-shadow:
+        0 2px 12px
+        rgba(0, 0, 0, 0.035);
+
+      transition:
+        transform 0.15s ease;
+
+      animation:
+        fadeInUp 0.25s ease both;
+    }
+
+    .disease-item:active {
+      transform: scale(0.985);
+    }
+
+    .disease-icon {
+      width: 44px;
+      height: 44px;
+
+      flex-shrink: 0;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      background: var(--secondary);
+
+      border-radius: 13px;
+
+      font-size: 21px;
+    }
+
+    .disease-info {
+      flex: 1;
+
+      min-width: 0;
+    }
+
+    .disease-name {
+      font-size: 14px;
+
+      font-weight: 600;
+    }
+
+    .disease-description {
+      margin-top: 2px;
+
+      font-size: 10px;
+
+      color: var(--hint);
+    }
+
+    .item-arrow {
+      color: var(--hint);
+
+      font-size: 23px;
+
+      line-height: 1;
+
+      transform: rotate(180deg);
+    }
+
+
+    /* =========================================================
+       DISEASE HERO
+    ========================================================= */
+
+    .disease-hero {
+      display: flex;
+
+      align-items: center;
+
+      gap: 13px;
+
+      padding: 18px;
+
+      margin-bottom: 17px;
+
+      background:
+        linear-gradient(
+          135deg,
+          color-mix(
+            in srgb,
+            var(--primary) 15%,
+            transparent
+          ),
+          var(--secondary)
+        );
+
+      border-radius:
+        var(--radius-xl);
+
+      animation:
+        fadeInUp 0.25s ease both;
+    }
+
+    .disease-hero-icon {
+      width: 58px;
+      height: 58px;
+
+      flex-shrink: 0;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      background: var(--card);
+
+      border-radius: 18px;
+
+      font-size: 29px;
+
+      box-shadow: var(--shadow);
+    }
+
+    .disease-hero-title {
+      margin: 0;
+
+      font-size: 21px;
+
+      font-weight: 800;
+    }
+
+    .disease-hero-category {
+      margin-top: 3px;
+
+      font-size: 11px;
+
+      color: var(--hint);
+    }
+
+
+    /* =========================================================
+       TABS
+    ========================================================= */
+
+    .tabs {
+      display: flex;
+
+      gap: 5px;
+
+      padding: 5px;
+
+      margin-bottom: 15px;
+
+      background: var(--secondary);
+
+      border-radius: 15px;
+
+      overflow-x: auto;
+
+      scrollbar-width: none;
+    }
+
+    .tabs::-webkit-scrollbar {
+      display: none;
+    }
+
+    .tab {
+      flex: 1;
+
+      min-width: 105px;
+
+      height: 42px;
+
+      padding:
+        0
+        9px;
+
+      background: transparent;
+
+      color: var(--hint);
+
+      border-radius: 11px;
+
+      font-size: 11px;
+
+      font-weight: 600;
+
+      white-space: nowrap;
+
+      transition: 0.2s ease;
+    }
+
+    .tab.active {
+      background: var(--card);
+
+      color: var(--primary);
+
+      box-shadow:
+        0 2px 8px
+        rgba(0, 0, 0, 0.08);
+    }
+
+
+    /* =========================================================
+       TAB CONTENT
+    ========================================================= */
+
+    .content-card {
+      min-height: 240px;
+
+      padding: 26px 19px;
+
+      text-align: center;
+
+      background: var(--card);
+
+      border:
+        1px dashed
+        color-mix(
+          in srgb,
+          var(--hint) 35%,
+          transparent
+        );
+
+      border-radius:
+        var(--radius-xl);
+
+      animation:
+        fadeInUp 0.25s ease both;
+    }
+
+    .content-icon {
+      font-size: 42px;
+
+      margin-bottom: 9px;
+    }
+
+    .content-title {
+      margin: 0 0 8px;
+
+      font-size: 16px;
+
+      font-weight: 700;
+    }
+
+    .content-text {
+      margin: 0;
+
+      font-size: 12px;
+
+      line-height: 2;
+
+      color: var(--hint);
+    }
+
+
+    /* =========================================================
+       SEARCH RESULTS
+    ========================================================= */
+
+    .search-results {
+      display: flex;
+
+      flex-direction: column;
+
+      gap: 9px;
+    }
+
+    .search-category {
+      font-size: 10px;
+
+      color: var(--hint);
+    }
+
+    .empty {
+      padding: 55px 20px;
+
+      text-align: center;
+
+      color: var(--hint);
+    }
+
+    .empty-icon {
+      font-size: 43px;
+
+      margin-bottom: 8px;
+    }
+
+    .empty-text {
+      margin: 0;
+
+      font-size: 13px;
+    }
+
+
+    /* =========================================================
+       ANIMATION
+    ========================================================= */
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(9px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+
+    /* =========================================================
+       RESPONSIVE
+    ========================================================= */
+
+    @media (min-width: 600px) {
+
+      #app {
+        padding-left: 24px;
+        padding-right: 24px;
+      }
+
+      .categories {
+        grid-template-columns:
+          repeat(3, minmax(0, 1fr));
+      }
+
+    }
+
+  </style>
+</head>
+
+
+<body>
+
+  <main id="app"></main>
+
+
+  <script>
+
+    /* =========================================================
+       TELEGRAM WEB APP
+    ========================================================= */
+
+    const tg =
+      window.Telegram &&
+      window.Telegram.WebApp
+        ? window.Telegram.WebApp
+        : {
+
+            ready: function () {},
+
+            expand: function () {},
+
+            themeParams: {},
+
+            BackButton: {
+              show: function () {},
+              hide: function () {},
+              onClick: function () {},
+              offClick: function () {}
+            },
+
+            MainButton: {
+              show: function () {},
+              hide: function () {}
+            }
+
+          };
+
+
+    try {
+      tg.ready();
+      tg.expand();
+    }
+    catch (e) {
+      console.log("Telegram WebApp API unavailable.");
+    }
+
+
+    /* =========================================================
+       TELEGRAM THEME
+    ========================================================= */
+
+    function applyTelegramTheme() {
+
+      const theme = tg.themeParams || {};
+
+      const root =
+        document.documentElement;
+
+      const values = {
+
+        "--bg":
+          theme.bg_color || "#ffffff",
+
+        "--text":
+          theme.text_color || "#1f2937",
+
+        "--hint":
+          theme.hint_color || "#6b7280",
+
+        "--secondary":
+          theme.secondary_bg_color || "#f3f4f6",
+
+        "--primary":
+          theme.button_color || "#2481cc",
+
+        "--primary-text":
+          theme.button_text_color || "#ffffff"
+
+      };
+
+
+      Object.keys(values).forEach(function (key) {
+
+        root.style.setProperty(
+          key,
+          values[key]
+        );
+
+      });
+
+    }
+
+
+    /* =========================================================
+       DATA
+    ========================================================= */
+
+    const categories = [
+
+      {
+        id: "vaccine",
+
+        title:
+          "بیماری‌های قابل پیشگیری با واکسن",
+
+        shortTitle:
+          "قابل پیشگیری با واکسن",
+
+        icon: "💉",
+
+        diseases: [
+
+          {
+            id: "measles",
+            title: "سرخک",
+            icon: "🦠"
+          },
+
+          {
+            id: "rubella",
+            title: "سرخجه",
+            icon: "🦠"
+          },
+
+          {
+            id: "mumps",
+            title: "اوریون",
+            icon: "🦠"
+          },
+
+          {
+            id: "polio",
+            title: "فلج اطفال",
+            icon: "🦽"
+          },
+
+          {
+            id: "pertussis",
+            title: "سیاه‌سرفه",
+            icon: "😷"
+          },
+
+          {
+            id: "diphtheria",
+            title: "دیفتری",
+            icon: "🦠"
+          },
+
+          {
+            id: "tetanus",
+            title: "کزاز",
+            icon: "🩹"
+          },
+
+          {
+            id: "chickenpox",
+            title: "آبله‌مرغان",
+            icon: "🔴"
+          },
+
+          {
+            id: "meningitis",
+            title: "مننژیت",
+            icon: "🧠"
+          }
+
+        ]
+      },
+
+
+      {
+        id: "respiratory",
+
+        title:
+          "بیماری‌های تنفسی / تماسی",
+
+        shortTitle:
+          "تنفسی / تماسی",
+
+        icon: "🫁",
+
+        diseases: [
+
+          {
+            id: "tb",
+            title: "سل",
+            icon: "🫁"
+          },
+
+          {
+            id: "covid",
+            title: "کرونا",
+            icon: "🦠"
+          },
+
+          {
+            id: "influenza",
+            title: "آنفلوانزا",
+            icon: "🤧"
+          },
+
+          {
+            id: "leprosy",
+            title: "جذام",
+            icon: "🩺"
+          }
+
+        ]
+      },
+
+
+      {
+        id: "water-food",
+
+        title:
+          "بیماری‌های منتقله از آب و غذا",
+
+        shortTitle:
+          "منتقله از آب و غذا",
+
+        icon: "💧",
+
+        diseases: [
+
+          {
+            id: "cholera",
+            title: "وبا",
+            icon: "💧"
+          },
+
+          {
+            id: "typhoid",
+            title: "تیفوئید",
+            icon: "🌡️"
+          },
+
+          {
+            id: "hepatitis-a",
+            title: "هپاتیت A",
+            icon: "🟡"
+          },
+
+          {
+            id: "botulism",
+            title: "بوتولیسم",
+            icon: "⚠️"
+          },
+
+          {
+            id: "food-outbreak",
+            title:
+              "طغیان بیماری‌های منتقله از آب و غذا",
+            icon: "📊"
+          }
+
+        ]
+      },
+
+
+      {
+        id: "blood-contact",
+
+        title:
+          "هپاتیت‌های ویروسی (خونی / تماسی)",
+
+        shortTitle:
+          "هپاتیت‌های ویروسی",
+
+        icon: "🩸",
+
+        diseases: [
+
+          {
+            id: "hepatitis-b",
+            title: "هپاتیت B",
+            icon: "🟠"
+          },
+
+          {
+            id: "hepatitis-c",
+            title: "هپاتیت C",
+            icon: "🟣"
+          },
+
+          {
+            id: "hiv",
+            title: "HIV",
+            icon: "🩸"
+          }
+
+        ]
+      },
+
+
+      {
+        id: "zoonosis",
+
+        title:
+          "بیماری‌های زئونوز",
+
+        shortTitle:
+          "زئونوز",
+
+        icon: "🐾",
+
+        diseases: [
+
+          {
+            id: "rabies",
+            title: "هاری",
+            icon: "🐕"
+          },
+
+          {
+            id: "anthrax",
+            title: "سیاه‌زخم",
+            icon: "⚫"
+          },
+
+          {
+            id: "cchf",
+            title: "تب کریمه کنگو",
+            icon: "🦠"
+          },
+
+          {
+            id: "dengue",
+            title: "تب دنگی",
+            icon: "🦟"
+          },
+
+          {
+            id: "malaria",
+            title: "مالاریا",
+            icon: "🦟"
+          },
+
+          {
+            id: "brucellosis",
+            title: "تب مالت",
+            icon: "🥛"
+          },
+
+          {
+            id: "hydatid",
+            title: "کیست هیداتیک",
+            icon: "🔬"
+          }
+
+        ]
+      },
+
+
+      {
+        id: "bites",
+
+        title:
+          "گزش و گزیدگی",
+
+        shortTitle:
+          "گزش و گزیدگی",
+
+        icon: "🦂",
+
+        diseases: [
+
+          {
+            id: "scorpion",
+            title: "عقرب‌زدگی",
+            icon: "🦂"
+          },
+
+          {
+            id: "snake",
+            title: "مارگزیدگی",
+            icon: "🐍"
+          }
+
+        ]
+      },
+
+
+      {
+        id: "other",
+
+        title:
+          "سایر",
+
+        shortTitle:
+          "سایر",
+
+        icon: "🩺",
+
+        diseases: [
+
+          {
+            id: "pediculosis",
+            title: "پدیکلوزیس",
+            icon: "🪮"
+          },
+
+          {
+            id: "scabies",
+            title: "گال",
+            icon: "🩺"
+          }
+
+        ]
+      }
+
+    ];
+
+
+    /* =========================================================
+       STATE
+    ========================================================= */
+
+    const state = {
+
+      page: "home",
+
+      categoryId: null,
+
+      diseaseId: null,
+
+      activeTab: "summary",
+
+      history: []
+
+    };
+
+
+    const app =
+      document.getElementById("app");
+
+
+    /* =========================================================
+       HELPERS
+    ========================================================= */
+
+    function getCategory(id) {
+
+      return categories.find(
+        function (category) {
+          return category.id === id;
+        }
+      );
+
+    }
+
+
+    function getDisease(
+      categoryId,
+      diseaseId
+    ) {
+
+      const category =
+        getCategory(categoryId);
+
+      if (!category) {
+        return null;
+      }
+
+      return category.diseases.find(
+        function (disease) {
+          return disease.id === diseaseId;
+        }
+      );
+
+    }
+
+
+    function getAllDiseases() {
+
+      const result = [];
+
+      categories.forEach(
+        function (category) {
+
+          category.diseases.forEach(
+            function (disease) {
+
+              result.push({
+
+                id: disease.id,
+
+                title: disease.title,
+
+                icon: disease.icon,
+
+                categoryId:
+                  category.id,
+
+                categoryTitle:
+                  category.shortTitle
+
+              });
+
+            }
+          );
+
+        }
+      );
+
+      return result;
+
+    }
+
+
+    /* =========================================================
+       NAVIGATION
+    ========================================================= */
+
+    function navigate(
+      page,
+      categoryId = null,
+      diseaseId = null
+    ) {
+
+      state.history.push({
+
+        page: state.page,
+
+        categoryId:
+          state.categoryId,
+
+        diseaseId:
+          state.diseaseId,
+
+        activeTab:
+          state.activeTab
+
+      });
+
+
+      state.page = page;
+
+      state.categoryId =
+        categoryId;
+
+      state.diseaseId =
+        diseaseId;
+
+      state.activeTab =
+        "summary";
+
+
+      render();
+
+    }
+
+
+    function goBack() {
+
+      if (
+        state.history.length === 0
+      ) {
+
+        return;
+
+      }
+
+
+      const previous =
+        state.history.pop();
+
+
+      state.page =
+        previous.page;
+
+      state.categoryId =
+        previous.categoryId;
+
+      state.diseaseId =
+        previous.diseaseId;
+
+      state.activeTab =
+        previous.activeTab;
+
+
+      render();
+
+    }
+
+
+    function goHome() {
+
+      state.history = [];
+
+      state.page =
+        "home";
+
+      state.categoryId =
+        null;
+
+      state.diseaseId =
+        null;
+
+      state.activeTab =
+        "summary";
+
+
+      render();
+
+    }
+
+
+    /* =========================================================
+       TELEGRAM BACK BUTTON
+    ========================================================= */
+
+    function updateTelegramButtons() {
+
+      try {
+
+        if (
+          state.page === "home"
+        ) {
+
+          tg.BackButton.hide();
+
+          tg.MainButton.hide();
+
+        }
+        else {
+
+          tg.BackButton.show();
+
+          tg.MainButton.hide();
+
+        }
+
+      }
+      catch (error) {
+
+        console.log(
+          "Telegram buttons unavailable."
+        );
+
+      }
+
+    }
+
+
+    /* =========================================================
+       INTERNAL BACK BUTTON
+    ========================================================= */
+
+    function internalBackButtonHTML() {
+
+      if (
+        state.page === "home"
+      ) {
+
+        return "";
+
+      }
+
+
+      return `
+
+        <div class="internal-header">
+
+          <button
+            type="button"
+            class="back-button"
+            id="internalBackButton"
+            aria-label="بازگشت"
+          >
+
+            <span class="back-arrow">
+              →
+            </span>
+
+            <span>
+              بازگشت
+            </span>
+
+          </button>
+
+        </div>
+
+      `;
+
+    }
+
+
+    function bindBackButton() {
+
+      const button =
+        document.getElementById(
+          "internalBackButton"
+        );
+
+
+      if (button) {
+
+        button.addEventListener(
+          "click",
+          goBack
+        );
+
+      }
+
+    }
+
+
+    /* =========================================================
+       RENDER
+    ========================================================= */
+
+    function render() {
+
+      updateTelegramButtons();
+
+
+      if (
+        state.page === "home"
+      ) {
+
+        renderHome();
+
+      }
+
+      else if (
+        state.page === "category"
+      ) {
+
+        renderCategory();
+
+      }
+
+      else if (
+        state.page === "disease"
+      ) {
+
+        renderDisease();
+
+      }
+
+
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+      });
+
+    }
+
+
+    /* =========================================================
+       HOME
+    ========================================================= */
+
+    function renderHome() {
+
+      app.innerHTML = `
+
+        <header class="main-header">
+
+          <div class="brand">
+
+            <div class="brand-icon">
+              📚
+            </div>
+
+            <div>
+
+              <h1 class="brand-title">
+                کتابخانه دیجیتال
+                <br>
+                نظام مراقبت بیماری‌ها
+              </h1>
+
+            </div>
+
+          </div>
+
+
+          <p class="brand-description">
+            دسترسی سریع به تعاریف،
+            دستورالعمل‌ها و فرم‌های بیماری‌ها
+          </p>
+
+        </header>
+
+
+        <div class="search-box">
+
+          <span class="search-icon">
+            🔍
+          </span>
+
+          <input
+            id="searchInput"
+            class="search-input"
+            type="search"
+            placeholder="جستجوی بیماری..."
+            autocomplete="off"
+            aria-label="جستجوی بیماری"
+          >
+
+        </div>
+
+
+        <div id="homeContent">
+
+          ${renderCategories()}
+
+        </div>
+
+      `;
+
+
+      const searchInput =
+        document.getElementById(
+          "searchInput"
+        );
+
+
+      searchInput.addEventListener(
+        "input",
+        handleSearch
+      );
+
+
+      bindCategoryButtons();
+
+    }
+
+
+    /* =========================================================
+       CATEGORIES
+    ========================================================= */
+
+    function renderCategories() {
+
+      return `
+
+        <div class="section-title">
+          دسته‌بندی بیماری‌ها
+        </div>
+
+
+        <section class="categories">
+
+          ${categories.map(
+            function (
+              category,
+              index
+            ) {
+
+              return `
+
+                <button
+                  type="button"
+                  class="category-card"
+                  data-category-id="${category.id}"
+                  style="
+                    animation-delay:
+                    ${index * 0.04}s
+                  "
+                >
+
+                  <div class="category-icon">
+                    ${category.icon}
+                  </div>
+
+
+                  <div>
+
+                    <div class="category-name">
+                      ${category.shortTitle}
+                    </div>
+
+                    <div class="category-count">
+                      ${category.diseases.length}
+                      بیماری
+                    </div>
+
+                  </div>
+
+                </button>
+
+              `;
+
+            }
+          ).join("")}
+
+        </section>
+
+      `;
+
+    }
+
+
+    function bindCategoryButtons() {
+
+      document
+        .querySelectorAll(
+          ".category-card"
+        )
+        .forEach(
+          function (button) {
+
+            button.addEventListener(
+              "click",
+              function () {
+
+                navigate(
+                  "category",
+                  button.dataset.categoryId
+                );
+
+              }
+            );
+
+          }
+        );
+
+    }
+
+
+    /* =========================================================
+       SEARCH
+    ========================================================= */
+
+    function normalizeText(text) {
+
+      return text
+
+        .replace(/ي/g, "ی")
+
+        .replace(/ك/g, "ک")
+
+        .replace(/\u200c/g, "")
+
+        .toLowerCase();
+
+    }
+
+
+    function handleSearch(event) {
+
+      const query =
+        normalizeText(
+          event.target.value.trim()
+        );
+
+
+      const content =
+        document.getElementById(
+          "homeContent"
+        );
+
+
+      if (!query) {
+
+        content.innerHTML =
+          renderCategories();
+
+        bindCategoryButtons();
+
+        return;
+
+      }
+
+
+      const results =
+        getAllDiseases()
+          .filter(
+            function (item) {
+
+              return normalizeText(
+                item.title
+              ).includes(query);
+
+            }
+          );
+
+
+      if (
+        results.length === 0
+      ) {
+
+        content.innerHTML = `
+
+          <div class="empty">
+
+            <div class="empty-icon">
+              🔎
+            </div>
+
+            <p class="empty-text">
+              موردی یافت نشد
+            </p>
+
+          </div>
+
+        `;
+
+        return;
+
+      }
+
+
+      content.innerHTML = `
+
+        <div class="section-title">
+          نتایج جستجو
+        </div>
+
+
+        <div class="search-results">
+
+          ${results.map(
+            function (item) {
+
+              return `
+
+                <button
+                  type="button"
+                  class="disease-item search-item"
+                  data-category-id="${item.categoryId}"
+                  data-disease-id="${item.id}"
+                >
+
+                  <div class="disease-icon">
+                    ${item.icon}
+                  </div>
+
+
+                  <div class="disease-info">
+
+                    <div class="disease-name">
+                      ${item.title}
+                    </div>
+
+                    <div class="search-category">
+                      ${item.categoryTitle}
+                    </div>
+
+                  </div>
+
+
+                  <div class="item-arrow">
+                    ‹
+                  </div>
+
+                </button>
+
+              `;
+
+            }
+          ).join("")}
+
+        </div>
+
+      `;
+
+
+      document
+        .querySelectorAll(
+          ".search-item"
+        )
+        .forEach(
+          function (button) {
+
+            button.addEventListener(
+              "click",
+              function () {
+
+                navigate(
+                  "disease",
+                  button.dataset.categoryId,
+                  button.dataset.diseaseId
+                );
+
+              }
+            );
+
+          }
+        );
+
+    }
+
+
+    /* =========================================================
+       CATEGORY PAGE
+    ========================================================= */
+
+    function renderCategory() {
+
+      const category =
+        getCategory(
+          state.categoryId
+        );
+
+
+      if (!category) {
+
+        goHome();
+
+        return;
+
+      }
+
+
+      app.innerHTML = `
+
+        ${internalBackButtonHTML()}
+
+
+        <section class="page-title">
+
+          <h2>
+            ${category.icon}
+            ${category.title}
+          </h2>
+
+          <p class="page-subtitle">
+            ${category.diseases.length}
+            بیماری در این دسته‌بندی
+          </p>
+
+        </section>
+
+
+        <section class="disease-list">
+
+          ${category.diseases.map(
+            function (
+              disease,
+              index
+            ) {
+
+              return `
+
+                <button
+                  type="button"
+                  class="disease-item"
+                  data-disease-id="${disease.id}"
+                  style="
+                    animation-delay:
+                    ${index * 0.035}s
+                  "
+                >
+
+                  <div class="disease-icon">
+                    ${disease.icon}
+                  </div>
+
+
+                  <div class="disease-info">
+
+                    <div class="disease-name">
+                      ${disease.title}
+                    </div>
+
+                    <div class="disease-description">
+                      مشاهده اطلاعات و مستندات
+                    </div>
+
+                  </div>
+
+
+                  <div class="item-arrow">
+                    ‹
+                  </div>
+
+                </button>
+
+              `;
+
+            }
+          ).join("")}
+
+        </section>
+
+      `;
+
+
+      bindBackButton();
+
+
+      document
+        .querySelectorAll(
+          ".disease-item"
+        )
+        .forEach(
+          function (button) {
+
+            button.addEventListener(
+              "click",
+              function () {
+
+                navigate(
+                  "disease",
+                  state.categoryId,
+                  button.dataset.diseaseId
+                );
+
+              }
+            );
+
+          }
+        );
+
+    }
+
+
+    /* =========================================================
+       DISEASE PAGE
+    ========================================================= */
+
+    function renderDisease() {
+
+      const category =
+        getCategory(
+          state.categoryId
+        );
+
+
+      const disease =
+        getDisease(
+          state.categoryId,
+          state.diseaseId
+        );
+
+
+      if (
+        !category ||
+        !disease
+      ) {
+
+        goHome();
+
+        return;
+
+      }
+
+
+      app.innerHTML = `
+
+        ${internalBackButtonHTML()}
+
+
+        <section class="disease-hero">
+
+          <div class="disease-hero-icon">
+            ${disease.icon}
+          </div>
+
+
+          <div>
+
+            <h2 class="disease-hero-title">
+              ${disease.title}
+            </h2>
+
+            <div class="disease-hero-category">
+              ${category.shortTitle}
+            </div>
+
+          </div>
+
+        </section>
+
+
+        <div class="tabs">
+
+          <button
+            type="button"
+            class="tab ${
+              state.activeTab === "summary"
+                ? "active"
+                : ""
+            }"
+            data-tab="summary"
+          >
+            تعاریف و خلاصه
+          </button>
+
+
+          <button
+            type="button"
+            class="tab ${
+              state.activeTab === "guideline"
+                ? "active"
+                : ""
+            }"
+            data-tab="guideline"
+          >
+            دستورالعمل رسمی
+          </button>
+
+
+          <button
+            type="button"
+            class="tab ${
+              state.activeTab === "forms"
+                ? "active"
+                : ""
+            }"
+            data-tab="forms"
+          >
+            فرم‌ها
+          </button>
+
+        </div>
+
+
+        <div id="tabContent">
+
+          ${renderTabContent(disease)}
+
+        </div>
+
+      `;
+
+
+      bindBackButton();
+
+
+      document
+        .querySelectorAll(".tab")
+        .forEach(
+          function (button) {
+
+            button.addEventListener(
+              "click",
+              function () {
+
+                state.activeTab =
+                  button.dataset.tab;
+
+                renderDisease();
+
+              }
+            );
+
+          }
+        );
+
+    }
+
+
+    /* =========================================================
+       TAB CONTENT
+    ========================================================= */
+
+    function renderTabContent(
+      disease
+    ) {
+
+      const content = {
+
+        summary: {
+
+          icon: "📖",
+
+          title:
+            "تعاریف و خلاصه",
+
+          text:
+            `محتوای تعاریف، اپیدمیولوژی،
+            علائم، تشخیص و خلاصه اطلاعات
+            بیماری «${disease.title}»
+            در آینده در این بخش قرار می‌گیرد.`
+
+        },
+
+
+        guideline: {
+
+          icon: "📋",
+
+          title:
+            "دستورالعمل رسمی",
+
+          text:
+            `دستورالعمل‌ها، راهنماها،
+            الگوریتم‌های تشخیص و مدیریت
+            بیماری «${disease.title}»
+            در این بخش قرار خواهند گرفت.`
+
+        },
+
+
+        forms: {
+
+          icon: "📝",
+
+          title:
+            "فرم‌ها",
+
+          text:
+            `فرم‌ها، چک‌لیست‌ها،
+            فرم‌های گزارش‌دهی و مستندات
+            اجرایی مربوط به «${disease.title}»
+            در این بخش قرار خواهند گرفت.`
+
+        }
+
+      };
+
+
+      const current =
+        content[
+          state.activeTab
+        ];
+
+
+      return `
+
+        <section class="content-card">
+
+          <div class="content-icon">
+            ${current.icon}
+          </div>
+
+
+          <h3 class="content-title">
+            ${current.title}
+          </h3>
+
+
+          <p class="content-text">
+            ${current.text}
+          </p>
+
+        </section>
+
+      `;
+
+    }
+
+
+    /* =========================================================
+       INITIALIZATION
+    ========================================================= */
+
+    applyTelegramTheme();
+
+    render();
+
+
+    /*
+      Telegram BackButton listener
+    */
+
+    try {
+
+      tg.BackButton.onClick(
+        goBack
+      );
+
+    }
+    catch (error) {
+
+      console.log(
+        "Telegram BackButton unavailable."
+      );
+
+    }
+
+
+    /*
+      MainButton فعلاً استفاده نمی‌شود
+    */
+
+    try {
+
+      tg.MainButton.hide();
+
+    }
+    catch (error) {}
+
+  </script>
+
+</body>
+</html>
