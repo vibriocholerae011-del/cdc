@@ -15,7 +15,7 @@ const CATEGORIES = [
       id:'vpd', num:'۰۱', color:'#0E6E66',
       name:'بیماری‌های قابل پیشگیری با واکسن',
       diseases:[
-        {id:'measles', name:'سرخک', sections:{definitions:null, guidelines:null, forms:null}},
+        {id:'measles', name:'سرخک', sections:{definitions:سلام به این بخش خوش امدید, guidelines:null, forms:null}},
         {id:'rubella', name:'سرخجه', sections:{definitions:null, guidelines:null, forms:null}},
         {id:'mumps', name:'اوریون', sections:{definitions:null, guidelines:null, forms:null}},
         {id:'polio', name:'فلج اطفال', sections:{definitions:null, guidelines:null, forms:null}},
