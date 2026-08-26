@@ -111,7 +111,7 @@ const CATEGORIES = [
         "id": "covid",
         "name": "کرونا",
         "sections": {
-          "definitions": null,
+          "definitions": "کرونا:&nbsp;<p>دوره کمون طولانی&nbsp;</p><p>دوره نقاهت کم</p>",
           "guidelines": null,
           "forms": null
         }
