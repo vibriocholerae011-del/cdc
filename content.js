@@ -24,7 +24,7 @@ const CATEGORIES = [
         "sections": {
           "definitions": "این بیماری یک بیماری واگیر دار هست که از طریق تنفسی انتقال پیدا می کند",
           "guidelines": "<a class=\"dl-btn\" href=\"forms/rubella-guideline.pdf\" target=\"_blank\" rel=\"noopener\">\n  <span class=\"dl-icon\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect x=\"6\" y=\"4\" width=\"12\" height=\"17\" rx=\"2\"/><path d=\"M9 4V3a1 1 0 011-1h4a1 1 0 011 1v1\"/><path d=\"M9 12.2l2 2 4-4.2\"/></svg></span>\n  <span class=\"dl-text\">\n    <span class=\"dl-title\">دستورالعمل</span>\n    <span class=\"dl-sub\">PDF · مشاهده یا دانلود</span>\n  </span>\n  <span class=\"dl-arrow\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M15 6l-6 6 6 6\"/></svg></span>\n</a>",
-          "forms": null
+          "forms": "<a class=\"dl-btn\" href=\"forms/rubella-form.pdf\" target=\"_blank\" rel=\"noopener\">\n  <span class=\"dl-icon\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect x=\"5\" y=\"3\" width=\"14\" height=\"18\" rx=\"2\"/><path d=\"M8 8h8M8 12h8M8 16h5\"/></svg></span>\n  <span class=\"dl-text\">\n    <span class=\"dl-title\">فرم سرخجه (نسخه رسمی)</span>\n    <span class=\"dl-sub\">PDF · مشاهده یا دانلود</span>\n  </span>\n  <span class=\"dl-arrow\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M15 6l-6 6 6 6\"/></svg></span>\n</a>"
         }
       },
       {
@@ -111,7 +111,7 @@ const CATEGORIES = [
         "id": "covid",
         "name": "کرونا",
         "sections": {
-          "definitions": "کرونا:&nbsp;<p>دوره کمون طولانی&nbsp;</p><p>دوره نقاهت کم</p>",
+          "definitions": null,
           "guidelines": null,
           "forms": null
         }
