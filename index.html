@@ -414,7 +414,7 @@
   .panel strong{ font-weight:700; color:var(--catcolor, var(--primary-deep)); }
   .panel ul{ padding-inline-start:20px; margin:0 0 12px; }
   .panel li{ font-size:0.875rem; line-height:1.9; margin-bottom:8px; list-style:disc; }
-  .panel > div:not(.empty-state){
+  .panel > div:not(.empty-state):not(.attach-share-row){
     background:var(--surface);
     border:1px solid var(--line);
     border-radius:var(--radius-m);
@@ -565,6 +565,140 @@
     border-radius:var(--radius-s);
     padding:12px;
   }
+
+  .reset-btn{
+    width:100%;
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    margin-top:6px;
+    padding:12px;
+    border-radius:var(--radius-s);
+    border:1px dashed var(--line);
+    background:transparent;
+    color:var(--ink-faint);
+    font-size:0.8125rem;
+    font-weight:700;
+  }
+  .reset-btn:active{ background:var(--surface-sunken); color:var(--ink-soft); }
+  .reset-btn svg{ width:15px; height:15px; }
+
+  /* ============================================================
+     SCROLL TO TOP
+     ============================================================ */
+  .top-fab{
+    position:fixed;
+    left:18px;
+    bottom:calc(22px + var(--safe-bottom));
+    width:44px; height:44px;
+    border-radius:50%;
+    background:var(--primary);
+    color:#fff;
+    border:none;
+    box-shadow:var(--shadow-2);
+    display:flex; align-items:center; justify-content:center;
+    z-index:20;
+    opacity:0; transform:translateY(10px);
+    pointer-events:none;
+    transition:opacity .2s ease, transform .2s ease;
+  }
+  .top-fab.visible{ opacity:1; transform:translateY(0); pointer-events:auto; }
+  .top-fab svg{ width:19px; height:19px; }
+
+  /* ============================================================
+     SHARE BUTTONS + COPY PROTECTION
+     ============================================================ */
+  .disease-head-row{ display:flex; align-items:flex-start; justify-content:space-between; gap:10px; }
+  .share-btn{
+    flex:none;
+    width:34px; height:34px;
+    border-radius:50%;
+    background:var(--surface);
+    border:1px solid var(--line);
+    color:var(--ink-soft);
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:var(--shadow-1);
+    margin-top:8px;
+  }
+  .share-btn:active{ transform:scale(.92); }
+  .share-btn svg{ width:15px; height:15px; }
+
+  .panel-protected{
+    -webkit-user-select:none; user-select:none;
+    -webkit-touch-callout:none;
+  }
+  .attach-share-row{
+    display:flex; align-items:center; gap:8px; margin-top:6px;
+  }
+  .attach-share-row .dl-btn{ flex:1; margin-top:0; }
+  .attach-share-btn{
+    flex:none;
+    width:44px; height:44px;
+    border-radius:var(--radius-s);
+    background:var(--surface-sunken);
+    border:1px solid var(--line);
+    color:var(--ink-soft);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .attach-share-btn:active{ background:var(--surface); }
+  .attach-share-btn svg{ width:16px; height:16px; }
+
+  .toast{
+    position:fixed;
+    left:50%; bottom:calc(26px + var(--safe-bottom));
+    transform:translateX(-50%) translateY(10px);
+    background:var(--ink);
+    color:var(--paper);
+    font-size:0.8125rem;
+    font-weight:600;
+    padding:11px 18px;
+    border-radius:99px;
+    box-shadow:var(--shadow-2);
+    z-index:60;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .2s ease, transform .2s ease;
+    white-space:nowrap;
+  }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+
+  /* ============================================================
+     HOME FOOTER / CONTACT
+     ============================================================ */
+  .home-footer{
+    margin-top:22px;
+    width:100%;
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    padding:14px;
+    border-radius:var(--radius-m);
+    background:var(--surface);
+    border:1px solid var(--line);
+    color:var(--ink-soft);
+    font-size:0.8125rem;
+    font-weight:700;
+  }
+  .home-footer svg{ width:15px; height:15px; }
+
+  .contact-list{ display:flex; flex-direction:column; gap:10px; margin-top:6px; }
+  .contact-row{
+    display:flex; align-items:center; gap:13px;
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:var(--radius-m);
+    padding:14px 16px;
+    box-shadow:var(--shadow-1);
+    text-decoration:none;
+    color:var(--ink);
+  }
+  .contact-row:active{ background:var(--surface-sunken); }
+  .contact-icon{
+    width:40px; height:40px; border-radius:12px; flex:none;
+    display:flex; align-items:center; justify-content:center;
+    background:var(--primary-tint, color-mix(in srgb, var(--primary) 15%, var(--mixbase)));
+    color:var(--primary);
+  }
+  .contact-icon svg{ width:19px; height:19px; }
+  .contact-text{ flex:1; min-width:0; }
+  .contact-label{ font-size:0.75rem; color:var(--ink-faint); font-weight:600; }
+  .contact-value{ font-size:0.875rem; font-weight:700; margin-top:2px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 </style>
 </head>
 <body>
@@ -589,8 +723,11 @@
         <button class="icon-btn" id="searchBtn" aria-label="جستجو">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
         </button>
+        <button class="icon-btn" id="diseaseShareBtn" aria-label="اشتراک‌گذاری این بیماری" style="visibility:hidden">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="2.6"/><circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/><path d="M8.3 10.6l7.4-4.2M8.3 13.4l7.4 4.2"/></svg>
+        </button>
         <button class="icon-btn" id="settingsBtn" aria-label="تنظیمات نمایش">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 13.5a1.65 1.65 0 00.3-1.5 1.65 1.65 0 00-.3-1.5l1.4-1.9-2-2-2 1.4a1.65 1.65 0 00-1.5-.3L14.5 4.7h-3l-.8 2.6a1.65 1.65 0 00-1.5.3l-2-1.4-2 2 1.4 1.9a1.65 1.65 0 00-.3 1.5 1.65 1.65 0 00.3 1.5l-1.4 1.9 2 2 2-1.4a1.65 1.65 0 001.5.3l.8 2.6h3l.8-2.6a1.65 1.65 0 001.5-.3l2 1.4 2-2z"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="7" x2="20" y2="7"/><circle cx="14" cy="7" r="2.3"/><line x1="4" y1="17" x2="20" y2="17"/><circle cx="10" cy="17" r="2.3"/></svg>
         </button>
       </div>
     </div>
@@ -637,15 +774,15 @@
       <div class="sheet-label">فونت</div>
       <div class="opt-list" id="fontOpts">
         <button class="opt-btn" data-font="vazir">
-          وزیرمتن
+          Vazirmatn
           <svg class="ck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
         </button>
         <button class="opt-btn" data-font="yekan">
-          بی‌یکان
+          B Yekan
           <svg class="ck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
         </button>
         <button class="opt-btn" data-font="nazanin">
-          بی‌نازنین
+          B Nazanin
           <svg class="ck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
         </button>
       </div>
@@ -662,6 +799,11 @@
       </div>
       <div class="size-preview" id="sizePreview">نمونه‌ی متن — کتابخانه نظام مراقبت بیماری‌ها</div>
     </div>
+
+    <button class="reset-btn" id="resetSettingsBtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>
+      بازگشت به حالت پیش‌فرض
+    </button>
   </div>
 </div>
 
