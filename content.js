@@ -111,7 +111,7 @@ const CATEGORIES = [
         "id": "meningitis",
         "name": "مننژیت",
         "sections": {
-          "definitions": null,
+          "definitions": "سلام",
           "guidelines": null,
           "forms": null
         }
