@@ -97,6 +97,15 @@ const CATEGORIES = [
           "guidelines": null,
           "forms": null
         }
+      },
+      {
+        "id": "dis-2oq3",
+        "name": "ایمنسازی",
+        "sections": {
+          "definitions": null,
+          "guidelines": null,
+          "forms": null
+        }
       }
     ]
   },
