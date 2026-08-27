@@ -24,7 +24,7 @@ const CATEGORIES = [
     "num": "۰۱",
     "color": "#0E6E66",
     "icon": "shield",
-    "name": "بیماری‌های قابل پیشگیری با واکسن",
+    "name": "ایمنسازی و بیماری‌های قابل پیشگیری با واکسن",
     "diseases": [
       {
         "id": "measles",
