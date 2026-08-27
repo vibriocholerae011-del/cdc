@@ -117,15 +117,6 @@ const CATEGORIES = [
     "name": "بیماری‌های تنفسی و تماسی",
     "diseases": [
       {
-        "id": "meningitis",
-        "name": "مننژیت",
-        "sections": {
-          "definitions": "سلام",
-          "guidelines": null,
-          "forms": null
-        }
-      },
-      {
         "id": "tb",
         "name": "سل",
         "sections": {
