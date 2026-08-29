@@ -46,15 +46,6 @@ const CATEGORIES = [
         }
       },
       {
-        "id": "mumps",
-        "name": "اوریون",
-        "sections": {
-          "definitions": null,
-          "guidelines": null,
-          "forms": null
-        }
-      },
-      {
         "id": "polio",
         "name": "فلج اطفال",
         "sections": {
