@@ -124,6 +124,32 @@
     toastTimer = setTimeout(()=> toastEl.classList.remove('show'), 2200);
   }
 
+  /* ---------- analytics (GoatCounter) ---------- */
+  function gcCount(opts){
+    if (window.goatcounter && typeof window.goatcounter.count === 'function'){
+      try{ window.goatcounter.count(opts); }catch(e){}
+    }
+  }
+  function trackPageview(state){
+    let path = '/' + (state.view || 'home');
+    let title = SITE_CONFIG.title;
+    if (state.view === 'category'){
+      const cat = findCategory(state.catId);
+      path += '/' + state.catId;
+      if (cat) title = cat.name;
+    } else if (state.view === 'disease'){
+      const dis = findDisease(state.catId, state.disId);
+      path += '/' + state.catId + '/' + state.disId;
+      if (dis) title = dis.name;
+    } else if (state.view === 'contact'){
+      title = 'ارتباط با ما';
+    }
+    gcCount({ path, title, event: false });
+  }
+  function trackEvent(path, title){
+    gcCount({ path, title, event: true });
+  }
+
   /* ---------- sharing ---------- */
   function copyToClipboard(text){
     if (navigator.clipboard && navigator.clipboard.writeText){
@@ -155,8 +181,8 @@
   }
 
   let pendingShare = null;
-  function openShareMenu(text, url){
-    pendingShare = { text, url };
+  function openShareMenu(text, url, label){
+    pendingShare = { text, url, label: label || '' };
     shareMenuOverlay.classList.add('open');
   }
   function closeShareMenu(){ shareMenuOverlay.classList.remove('open'); }
@@ -165,25 +191,27 @@
   shareMenuList.addEventListener('click', (e)=>{
     const btn = e.target.closest('.share-menu-item');
     if (!btn || !pendingShare) return;
-    const { text, url } = pendingShare;
+    const { text, url, label } = pendingShare;
     const fullText = url ? (text + '\n' + url) : text;
-    if (btn.dataset.target === 'telegram'){
+    const channel = btn.dataset.target;
+    if (channel === 'telegram'){
       const shareUrl = 'https://t.me/share/url?url=' + encodeURIComponent(url || '') + '&text=' + encodeURIComponent(text);
       if (tg && tg.openTelegramLink){
         try{ tg.openTelegramLink(shareUrl); }catch(err){ window.open(shareUrl, '_blank'); }
       } else {
         window.open(shareUrl, '_blank');
       }
-    } else if (btn.dataset.target === 'bale'){
+    } else if (channel === 'bale'){
       copyToClipboard(fullText);
       showToast('متن کپی شد — داخل بله جای‌گذاری کن');
       const baleUrl = 'https://ble.ir/' + SITE_CONFIG.botUsername;
       if (tg && tg.openLink){ try{ tg.openLink(baleUrl); }catch(err){ window.open(baleUrl, '_blank'); } }
       else window.open(baleUrl, '_blank');
-    } else if (btn.dataset.target === 'copy'){
+    } else if (channel === 'copy'){
       copyToClipboard(fullText);
       showToast('در کلیپ‌بورد کپی شد');
     }
+    trackEvent('share/' + channel, 'اشتراک‌گذاری (' + channel + '): ' + label);
     closeShareMenu();
   });
 
@@ -203,7 +231,7 @@
       '',
       ...shareFooterLines(),
     ];
-    openShareMenu(lines.join('\n'), `https://t.me/${SITE_CONFIG.botUsername}`);
+    openShareMenu(lines.join('\n'), `https://t.me/${SITE_CONFIG.botUsername}`, `${dis.name} — ${TAB_LABELS[key]}`);
   }
   function shareFile(href, title, cat, dis){
     let fullUrl = href;
@@ -214,7 +242,7 @@
       '',
       ...shareFooterLines(),
     ];
-    openShareMenu(lines.join('\n'), fullUrl);
+    openShareMenu(lines.join('\n'), fullUrl, `${dis.name} — ${title || 'فایل'}`);
   }
 
   /* ---------- search index (fuzzy, ranked by closeness) ---------- */
@@ -515,8 +543,14 @@
       });
     });
 
-    // give every downloadable attachment its own share button
+    // give every downloadable attachment its own share button + download tracking
     viewEl.querySelectorAll('.panel .dl-btn').forEach(a => {
+      const titleEl = a.querySelector('.dl-title');
+      const attTitle = titleEl ? titleEl.textContent.trim() : dis.name;
+      a.addEventListener('click', ()=>{
+        trackEvent('download/' + a.getAttribute('href'), `دانلود: ${dis.name} — ${attTitle}`);
+      });
+
       const row = document.createElement('div');
       row.className = 'attach-share-row';
       a.parentNode.insertBefore(row, a);
@@ -528,8 +562,7 @@
       shareBtn.innerHTML = ICON_SHARE;
       shareBtn.addEventListener('click', (e)=>{
         e.preventDefault();
-        const titleEl = a.querySelector('.dl-title');
-        shareFile(a.getAttribute('href'), titleEl ? titleEl.textContent.trim() : dis.name, cat, dis);
+        shareFile(a.getAttribute('href'), attTitle, cat, dis);
       });
       row.appendChild(shareBtn);
     });
@@ -602,6 +635,7 @@
     if (tg){
       try{ state.view === 'home' ? tg.BackButton.hide() : tg.BackButton.show(); }catch(e){}
     }
+    trackPageview(state);
   }
   function navigateTo(state){
     history.pushState(state, '', '#'+state.view+(state.catId?'/'+state.catId:'')+(state.disId?'/'+state.disId:''));
