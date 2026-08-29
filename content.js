@@ -64,8 +64,8 @@ const CATEGORIES = [
         }
       },
       {
-        "id": "pertussis",
-        "name": "سیاه‌سرفه",
+        "id": "dis-2oq3",
+        "name": "ایمنسازی",
         "sections": {
           "definitions": null,
           "guidelines": null,
@@ -73,8 +73,8 @@ const CATEGORIES = [
         }
       },
       {
-        "id": "dis-2oq3",
-        "name": "ایمنسازی",
+        "id": "pertussis",
+        "name": "سیاه‌سرفه",
         "sections": {
           "definitions": null,
           "guidelines": null,
