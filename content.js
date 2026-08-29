@@ -73,8 +73,8 @@ const CATEGORIES = [
         }
       },
       {
-        "id": "diphtheria",
-        "name": "دیفتری",
+        "id": "dis-2oq3",
+        "name": "ایمنسازی",
         "sections": {
           "definitions": null,
           "guidelines": null,
@@ -82,8 +82,8 @@ const CATEGORIES = [
         }
       },
       {
-        "id": "dis-2oq3",
-        "name": "ایمنسازی",
+        "id": "diphtheria",
+        "name": "دیفتری",
         "sections": {
           "definitions": null,
           "guidelines": null,
@@ -111,53 +111,8 @@ const CATEGORIES = [
     ]
   },
   {
-    "id": "resp",
-    "num": "۰۲",
-    "color": "#2B5A8C",
-    "icon": "wind",
-    "name": "بیماری‌های تنفسی و تماسی",
-    "diseases": [
-      {
-        "id": "tb",
-        "name": "سل",
-        "sections": {
-          "definitions": null,
-          "guidelines": null,
-          "forms": null
-        }
-      },
-      {
-        "id": "covid",
-        "name": "کرونا",
-        "sections": {
-          "definitions": null,
-          "guidelines": null,
-          "forms": null
-        }
-      },
-      {
-        "id": "flu",
-        "name": "آنفلوانزا",
-        "sections": {
-          "definitions": null,
-          "guidelines": null,
-          "forms": null
-        }
-      },
-      {
-        "id": "leprosy",
-        "name": "جذام",
-        "sections": {
-          "definitions": null,
-          "guidelines": null,
-          "forms": null
-        }
-      }
-    ]
-  },
-  {
     "id": "food_water",
-    "num": "۰۳",
+    "num": "۰۲",
     "color": "#8A6D1B",
     "icon": "droplet",
     "name": "بیماری‌های منتقله از آب و غذا",
@@ -201,6 +156,51 @@ const CATEGORIES = [
       {
         "id": "foodwater_outbreak",
         "name": "طغیان بیماری‌های منتقله از آب و غذا",
+        "sections": {
+          "definitions": null,
+          "guidelines": null,
+          "forms": null
+        }
+      }
+    ]
+  },
+  {
+    "id": "resp",
+    "num": "۰۳",
+    "color": "#2B5A8C",
+    "icon": "wind",
+    "name": "بیماری‌های تنفسی و تماسی",
+    "diseases": [
+      {
+        "id": "tb",
+        "name": "سل",
+        "sections": {
+          "definitions": null,
+          "guidelines": null,
+          "forms": null
+        }
+      },
+      {
+        "id": "covid",
+        "name": "کرونا",
+        "sections": {
+          "definitions": null,
+          "guidelines": null,
+          "forms": null
+        }
+      },
+      {
+        "id": "flu",
+        "name": "آنفلوانزا",
+        "sections": {
+          "definitions": null,
+          "guidelines": null,
+          "forms": null
+        }
+      },
+      {
+        "id": "leprosy",
+        "name": "جذام",
         "sections": {
           "definitions": null,
           "guidelines": null,
