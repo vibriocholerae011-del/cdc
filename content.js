@@ -67,7 +67,7 @@ const CATEGORIES = [
         "id": "pertussis",
         "name": "سیاه‌سرفه",
         "sections": {
-          "definitions": null,
+          "definitions": "<p style=\"text-align: right;\"><b>سلام&nbsp;</b></p><p><img src=\"forms/pertussis-definitions-img-jvfa.png\" style=\"max-width: 100%;\"></p>",
           "guidelines": null,
           "forms": null
         }
