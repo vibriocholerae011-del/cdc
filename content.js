@@ -82,8 +82,8 @@ const CATEGORIES = [
         }
       },
       {
-        "id": "tetanus",
-        "name": "کزاز",
+        "id": "dis-2oq3",
+        "name": "ایمنسازی",
         "sections": {
           "definitions": null,
           "guidelines": null,
@@ -91,8 +91,8 @@ const CATEGORIES = [
         }
       },
       {
-        "id": "dis-2oq3",
-        "name": "ایمنسازی",
+        "id": "tetanus",
+        "name": "کزاز",
         "sections": {
           "definitions": null,
           "guidelines": null,
