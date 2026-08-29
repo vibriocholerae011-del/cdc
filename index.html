@@ -97,7 +97,7 @@
     background:color-mix(in srgb, var(--paper) 88%, transparent);
     backdrop-filter:blur(10px);
     -webkit-backdrop-filter:blur(10px);
-    padding:calc(var(--safe-top) + 14px) 18px 12px;
+    padding:calc(var(--safe-top) + 20px) 18px 12px;
     box-shadow:0 1px 0 var(--line);
   }
   .topbar-row{
@@ -105,6 +105,13 @@
     align-items:center;
     gap:10px;
     min-height:36px;
+  }
+  .topbar-row-2{
+    display:flex;
+    align-items:center;
+    justify-content:flex-start;
+    gap:8px;
+    margin-top:10px;
   }
   .icon-btn{
     display:flex;
@@ -159,8 +166,6 @@
     white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
   }
 
-  .topbar-spacer{ flex:1; }
-  .topbar-actions{ display:flex; align-items:center; gap:8px; flex:none; }
 
   main{
     flex:1;
@@ -411,6 +416,7 @@
   .empty-state .d{ font-size:0.7812rem; line-height:1.8; max-width:34ch; margin:0 auto; }
 
   .panel p{ font-size:0.875rem; line-height:1.95; margin:0 0 12px; color:var(--ink); }
+  .panel img{ max-width:100%; height:auto; border-radius:12px; margin:6px 0 14px; display:block; box-shadow:var(--shadow-1); }
   .panel strong{ font-weight:700; color:var(--catcolor, var(--primary-deep)); }
   .panel ul{ padding-inline-start:20px; margin:0 0 12px; }
   .panel li{ font-size:0.875rem; line-height:1.9; margin-bottom:8px; list-style:disc; }
@@ -582,12 +588,12 @@
   .reset-btn svg{ width:15px; height:15px; }
 
   /* ============================================================
-     SCROLL TO TOP
+     SCROLL TO TOP + FLOATING SHARE
      ============================================================ */
   .top-fab{
     position:fixed;
     left:18px;
-    bottom:calc(22px + var(--safe-bottom));
+    bottom:calc(38px + var(--safe-bottom));
     width:44px; height:44px;
     border-radius:50%;
     background:var(--primary);
@@ -603,24 +609,46 @@
   .top-fab.visible{ opacity:1; transform:translateY(0); pointer-events:auto; }
   .top-fab svg{ width:19px; height:19px; }
 
-  /* ============================================================
-     SHARE BUTTONS + COPY PROTECTION
-     ============================================================ */
-  .disease-head-row{ display:flex; align-items:flex-start; justify-content:space-between; gap:10px; }
-  .share-btn{
-    flex:none;
-    width:34px; height:34px;
+  .share-fab{
+    position:fixed;
+    right:18px;
+    bottom:calc(38px + var(--safe-bottom));
+    width:48px; height:48px;
     border-radius:50%;
     background:var(--surface);
+    color:var(--primary-deep);
     border:1px solid var(--line);
-    color:var(--ink-soft);
+    box-shadow:var(--shadow-2);
     display:flex; align-items:center; justify-content:center;
-    box-shadow:var(--shadow-1);
-    margin-top:8px;
+    z-index:20;
+    opacity:0; transform:translateY(10px);
+    pointer-events:none;
+    transition:opacity .2s ease, transform .2s ease;
   }
-  .share-btn:active{ transform:scale(.92); }
-  .share-btn svg{ width:15px; height:15px; }
+  .share-fab.visible{ opacity:1; transform:translateY(0); pointer-events:auto; }
+  .share-fab svg{ width:20px; height:20px; }
 
+  .share-menu-list{ display:flex; flex-direction:column; gap:8px; }
+  .share-menu-item{
+    display:flex; align-items:center; gap:12px;
+    width:100%; padding:14px 16px;
+    background:var(--surface-sunken);
+    border:1px solid var(--line);
+    border-radius:var(--radius-m);
+    font-size:0.875rem; font-weight:700; color:var(--ink);
+  }
+  .share-menu-item:active{ background:var(--surface); }
+  .share-menu-item .smi-icon{
+    width:36px; height:36px; border-radius:10px; flex:none;
+    display:flex; align-items:center; justify-content:center;
+    background:var(--primary-tint, color-mix(in srgb, var(--primary) 15%, var(--mixbase)));
+    color:var(--primary-deep);
+  }
+  .share-menu-item .smi-icon svg{ width:17px; height:17px; }
+
+  /* ============================================================
+     SHARE + COPY PROTECTION
+     ============================================================ */
   .panel-protected{
     -webkit-user-select:none; user-select:none;
     -webkit-touch-callout:none;
@@ -677,28 +705,38 @@
   }
   .home-footer svg{ width:15px; height:15px; }
 
-  .contact-list{ display:flex; flex-direction:column; gap:10px; margin-top:6px; }
+  .contact-list{ display:flex; flex-direction:column; gap:8px; margin-top:6px; }
   .contact-row{
-    display:flex; align-items:center; gap:13px;
+    display:flex; align-items:center; gap:11px;
     background:var(--surface);
     border:1px solid var(--line);
     border-radius:var(--radius-m);
-    padding:14px 16px;
+    padding:11px 13px;
     box-shadow:var(--shadow-1);
     text-decoration:none;
     color:var(--ink);
   }
   .contact-row:active{ background:var(--surface-sunken); }
   .contact-icon{
-    width:40px; height:40px; border-radius:12px; flex:none;
+    width:32px; height:32px; border-radius:10px; flex:none;
     display:flex; align-items:center; justify-content:center;
     background:var(--primary-tint, color-mix(in srgb, var(--primary) 15%, var(--mixbase)));
     color:var(--primary);
   }
-  .contact-icon svg{ width:19px; height:19px; }
+  .contact-icon svg{ width:15px; height:15px; }
   .contact-text{ flex:1; min-width:0; }
-  .contact-label{ font-size:0.75rem; color:var(--ink-faint); font-weight:600; }
-  .contact-value{ font-size:0.875rem; font-weight:700; margin-top:2px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .contact-label{ font-size:0.6875rem; color:var(--ink-faint); font-weight:600; }
+  .contact-value{ font-size:0.8125rem; font-weight:700; margin-top:1px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .contact-row > svg{ width:14px; height:14px; color:var(--ink-faint); flex:none; }
+
+  .dev-credit{
+    margin-top:14px;
+    text-align:center;
+    font-size:0.6875rem;
+    color:var(--ink-faint);
+    line-height:1.9;
+    padding:0 10px;
+  }
 </style>
 </head>
 <body>
@@ -718,22 +756,44 @@
           <h1 id="headTitle">کتابخانه دیجیتال</h1>
         </div>
       </div>
-      <div class="topbar-spacer"></div>
-      <div class="topbar-actions">
-        <button class="icon-btn" id="searchBtn" aria-label="جستجو">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
-        </button>
-        <button class="icon-btn" id="diseaseShareBtn" aria-label="اشتراک‌گذاری این بیماری" style="visibility:hidden">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="2.6"/><circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/><path d="M8.3 10.6l7.4-4.2M8.3 13.4l7.4 4.2"/></svg>
-        </button>
-        <button class="icon-btn" id="settingsBtn" aria-label="تنظیمات نمایش">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="7" x2="20" y2="7"/><circle cx="14" cy="7" r="2.3"/><line x1="4" y1="17" x2="20" y2="17"/><circle cx="10" cy="17" r="2.3"/></svg>
-        </button>
-      </div>
+    </div>
+    <div class="topbar-row-2">
+      <button class="icon-btn" id="searchBtn" aria-label="جستجو">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      </button>
+      <button class="icon-btn" id="settingsBtn" aria-label="تنظیمات نمایش">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="7" x2="20" y2="7"/><circle cx="14" cy="7" r="2.3"/><line x1="4" y1="17" x2="20" y2="17"/><circle cx="10" cy="17" r="2.3"/></svg>
+      </button>
     </div>
   </header>
 
   <main id="view" tabindex="-1"></main>
+</div>
+
+<div class="sheet-overlay" id="shareMenuOverlay">
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="shareMenuTitle" style="max-width:420px">
+    <div class="sheet-handle"></div>
+    <div class="sheet-head">
+      <h3 id="shareMenuTitle">اشتراک‌گذاری</h3>
+      <button class="icon-btn" id="shareMenuClose" aria-label="بستن">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+    <div class="share-menu-list" id="shareMenuList">
+      <button class="share-menu-item" data-target="telegram">
+        <span class="smi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 4L3 11l6 2.5M21 4l-7.5 16-4.5-7.5M21 4L9.5 13.5"/></svg></span>
+        اشتراک‌گذاری در تلگرام
+      </button>
+      <button class="share-menu-item" data-target="bale">
+        <span class="smi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5L16 9.5"/></svg></span>
+        اشتراک‌گذاری در بله
+      </button>
+      <button class="share-menu-item" data-target="copy">
+        <span class="smi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 012-2h10"/></svg></span>
+        کپی در کلیپ‌بورد
+      </button>
+    </div>
+  </div>
 </div>
 
 <div class="sheet-overlay" id="sheetOverlay">

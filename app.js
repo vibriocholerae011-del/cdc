@@ -22,8 +22,10 @@
   const headEyebrow = document.getElementById('headEyebrow');
   const headTitle = document.getElementById('headTitle');
   const searchBtn = document.getElementById('searchBtn');
-  const diseaseShareBtn = document.getElementById('diseaseShareBtn');
   const settingsBtn = document.getElementById('settingsBtn');
+  const shareMenuOverlay = document.getElementById('shareMenuOverlay');
+  const shareMenuClose = document.getElementById('shareMenuClose');
+  const shareMenuList = document.getElementById('shareMenuList');
   const sheetOverlay = document.getElementById('sheetOverlay');
   const sheetClose = document.getElementById('sheetClose');
   const modeSeg = document.getElementById('modeSeg');
@@ -123,32 +125,85 @@
   }
 
   /* ---------- sharing ---------- */
-  function shareViaTelegram(text, url){
-    const shareUrl = 'https://t.me/share/url?url=' + encodeURIComponent(url || '') + '&text=' + encodeURIComponent(text);
-    if (tg && tg.openTelegramLink){
-      try{ tg.openTelegramLink(shareUrl); return; }catch(e){}
+  function copyToClipboard(text){
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).catch(()=> fallbackCopy(text));
+    } else {
+      fallbackCopy(text);
     }
-    if (navigator.share){
-      navigator.share({ text: text, url: url }).catch(()=>{});
-      return;
-    }
-    window.open(shareUrl, '_blank');
   }
+  function fallbackCopy(text){
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.focus(); ta.select();
+    try{ document.execCommand('copy'); }catch(e){}
+    document.body.removeChild(ta);
+  }
+
   function shareFooterLines(){
-    const lines = ['━━━━━━━━', `🤖 @${SITE_CONFIG.botUsername} · ${SITE_CONFIG.title}`];
-    if (SITE_CONFIG.contact && SITE_CONFIG.contact.telegramChannel) lines.push(`📢 @${SITE_CONFIG.contact.telegramChannel}`);
+    const lines = [
+      '━━━━━━━━',
+      'برای دسترسی به دستورالعمل‌ها و فرم‌ها به ربات مراجعه کنید:',
+      `🤖 تلگرام: @${SITE_CONFIG.botUsername}`,
+      `🔵 بله: https://ble.ir/${SITE_CONFIG.botUsername}`,
+    ];
+    if (SITE_CONFIG.contact && SITE_CONFIG.contact.telegramChannel) lines.push(`📢 کانال: @${SITE_CONFIG.contact.telegramChannel}`);
     return lines;
   }
-  function shareDisease(cat, dis){
-    const excerpt = stripHtml(dis.sections.definitions || '').slice(0, 180).trim();
+
+  let pendingShare = null;
+  function openShareMenu(text, url){
+    pendingShare = { text, url };
+    shareMenuOverlay.classList.add('open');
+  }
+  function closeShareMenu(){ shareMenuOverlay.classList.remove('open'); }
+  shareMenuClose.addEventListener('click', closeShareMenu);
+  shareMenuOverlay.addEventListener('click', (e)=>{ if (e.target === shareMenuOverlay) closeShareMenu(); });
+  shareMenuList.addEventListener('click', (e)=>{
+    const btn = e.target.closest('.share-menu-item');
+    if (!btn || !pendingShare) return;
+    const { text, url } = pendingShare;
+    const fullText = url ? (text + '\n' + url) : text;
+    if (btn.dataset.target === 'telegram'){
+      const shareUrl = 'https://t.me/share/url?url=' + encodeURIComponent(url || '') + '&text=' + encodeURIComponent(text);
+      if (tg && tg.openTelegramLink){
+        try{ tg.openTelegramLink(shareUrl); }catch(err){ window.open(shareUrl, '_blank'); }
+      } else {
+        window.open(shareUrl, '_blank');
+      }
+    } else if (btn.dataset.target === 'bale'){
+      copyToClipboard(fullText);
+      showToast('متن کپی شد — داخل بله جای‌گذاری کن');
+      const baleUrl = 'https://ble.ir/' + SITE_CONFIG.botUsername;
+      if (tg && tg.openLink){ try{ tg.openLink(baleUrl); }catch(err){ window.open(baleUrl, '_blank'); } }
+      else window.open(baleUrl, '_blank');
+    } else if (btn.dataset.target === 'copy'){
+      copyToClipboard(fullText);
+      showToast('در کلیپ‌بورد کپی شد');
+    }
+    closeShareMenu();
+  });
+
+  function shareCurrentDisease(){
+    const st = history.state;
+    if (!st || st.view !== 'disease') return;
+    const cat = findCategory(st.catId);
+    const dis = findDisease(st.catId, st.disId);
+    if (!cat || !dis) return;
+    const activeBtn = viewEl.querySelector('.tab-btn.active');
+    const key = activeBtn ? activeBtn.dataset.tab : 'definitions';
+    const plain = stripHtml(dis.sections[key] || '').trim().slice(0, 3500);
     const lines = [
-      `📚 ${dis.name} — ${cat.name}`,
+      `📚 ${dis.name} — ${TAB_LABELS[key]}`,
       '',
-      excerpt || SITE_CONFIG.subtitle,
+      plain || `${dis.name} — ${cat.name}`,
       '',
       ...shareFooterLines(),
     ];
-    shareViaTelegram(lines.join('\n'), `https://t.me/${SITE_CONFIG.botUsername}`);
+    openShareMenu(lines.join('\n'), `https://t.me/${SITE_CONFIG.botUsername}`);
   }
   function shareFile(href, title, cat, dis){
     let fullUrl = href;
@@ -159,7 +214,7 @@
       '',
       ...shareFooterLines(),
     ];
-    shareViaTelegram(lines.join('\n'), fullUrl);
+    openShareMenu(lines.join('\n'), fullUrl);
   }
 
   /* ---------- search index (fuzzy, ranked by closeness) ---------- */
@@ -316,7 +371,7 @@
     headEyebrow.textContent = 'کتابخانه دیجیتال';
     headTitle.textContent = SITE_CONFIG.title;
     backBtn.classList.remove('visible');
-    diseaseShareBtn.style.visibility = 'hidden';
+    shareFab.classList.remove('visible');
 
     const cardsHtml = CATEGORIES.map(cat => `
       <li>
@@ -349,6 +404,7 @@
         </div>
         <div id="homeResults"></div>
         <button class="home-footer" data-nav="contact">${ICON_CONTACT} ارتباط با ما</button>
+        ${SITE_CONFIG.developerCredit ? `<div class="dev-credit">${SITE_CONFIG.developerCredit}</div>` : ''}
       </div>
     `;
 
@@ -398,7 +454,7 @@
     headEyebrow.innerHTML = `<span class="cat-pill" style="--pill:${cat.color}"><span class="dot"></span>بخش ${cat.num}</span>`;
     headTitle.textContent = cat.name;
     backBtn.classList.add('visible');
-    diseaseShareBtn.style.visibility = 'hidden';
+    shareFab.classList.remove('visible');
 
     const rows = cat.diseases.map(d => `
       <li>
@@ -438,8 +494,7 @@
     headEyebrow.innerHTML = `<span class="cat-pill" style="--pill:${cat.color}"><span class="dot"></span>${cat.name}</span>`;
     headTitle.textContent = dis.name;
     backBtn.classList.add('visible');
-    diseaseShareBtn.style.visibility = 'visible';
-    diseaseShareBtn.onclick = () => shareDisease(cat, dis);
+    shareFab.classList.add('visible');
 
     const tabs = TAB_ORDER.map(k => `<button class="tab-btn${k===activeTab?' active':''}" data-tab="${k}">${TAB_ICONS[k]}${TAB_LABELS[k]}</button>`).join('');
     const panels = TAB_ORDER.map(k => sectionPanelHtml(k, dis.sections[k])).join('');
@@ -484,7 +539,7 @@
     headEyebrow.textContent = SITE_CONFIG.title;
     headTitle.textContent = 'ارتباط با ما';
     backBtn.classList.add('visible');
-    diseaseShareBtn.style.visibility = 'hidden';
+    shareFab.classList.remove('visible');
 
     const c = SITE_CONFIG.contact || {};
     const rows = [];
@@ -600,6 +655,14 @@
     topFab.classList.toggle('visible', scrolled && cur === 'disease');
   }
   window.addEventListener('scroll', updateTopFab, {passive:true});
+
+  /* ---------- floating share button (disease pages only) ---------- */
+  const shareFab = document.createElement('button');
+  shareFab.className = 'share-fab';
+  shareFab.setAttribute('aria-label', 'اشتراک‌گذاری این بیماری');
+  shareFab.innerHTML = ICON_SHARE;
+  document.body.appendChild(shareFab);
+  shareFab.addEventListener('click', shareCurrentDisease);
 
   /* ---------- copy protection (deterrent, not absolute — see note to admin) ----------
      Prevents casual copy/cut/right-click-copy on disease content so people are nudged
