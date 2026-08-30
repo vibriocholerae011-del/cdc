@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>کتابخانه نظام مراقبت بیماری‌ها</title>
+<meta name="theme-color" content="#0E6E66">
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script>window.goatcounter = { no_onload: true };</script>
+<script id="gcScript" data-goatcounter="https://cdciran.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  /* ============================================================
+     DESIGN TOKENS — LIGHT (default)
+     ============================================================ */
+  :root{
+    --paper: #F5F6F3;
+    --surface: #FFFFFF;
+    --surface-sunken: #ECEEEA;
+    --ink: #15202A;
+    --ink-soft: #55636B;
+    --ink-faint: #8D9AA0;
+    --line: #E1E5DE;
+    --primary: #0E6E66;
+    --primary-deep: #0A4F49;
+    --primary-bright: #12A296;
+    --mixbase: #FFFFFF;
+    --shadow-1: 0 1px 2px rgba(21,32,42,.06), 0 1px 1px rgba(21,32,42,.04);
+    --shadow-2: 0 8px 20px -8px rgba(21,32,42,.16), 0 2px 6px -2px rgba(21,32,42,.08);
+    --radius-s: 10px;
+    --radius-m: 16px;
+    --radius-l: 22px;
+    --font-fa: 'Vazirmatn', Tahoma, 'Segoe UI', sans-serif;
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  html[data-theme="dark"]{
+    --paper: #0C1315;
+    --surface: #141C1F;
+    --surface-sunken: #0F1618;
+    --ink: #ECF2F0;
+    --ink-soft: #9DAFAC;
+    --ink-faint: #647573;
+    --line: #202B2D;
+    --primary: #2FD9C6;
+    --primary-deep: #1FBBA9;
+    --primary-bright: #45E6D3;
+    --mixbase: #141C1F;
+    --shadow-1: 0 1px 2px rgba(0,0,0,.5), 0 1px 1px rgba(0,0,0,.3);
+    --shadow-2: 0 10px 24px -10px rgba(0,0,0,.55), 0 2px 8px -2px rgba(0,0,0,.4);
+  }
+
+  *{ box-sizing:border-box; }
+  html{ font-size:var(--root-fs, 16px); }
+  html,body{ margin:0; padding:0; }
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--font-fa);
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+    transition:background .25s ease, color .25s ease;
+  }
+  h1,h2,h3,p,ul{ margin:0; }
+  ul{ list-style:none; padding:0; }
+  a{ color:inherit; }
+  /* Buttons/inputs don't inherit color from the page by default in the
+     browser's own stylesheet — without this reset they silently stay
+     dark-on-dark in dark mode regardless of our theme variables. */
+  button, input, textarea, select{ font-family:inherit; color:inherit; }
+  button{ background:none; border:none; }
+
+  button:focus-visible, [tabindex]:focus-visible, input:focus-visible{
+    outline:2.5px solid var(--primary);
+    outline-offset:2px;
+    border-radius:6px;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:.001ms !important; transition-duration:.001ms !important; }
+  }
+
+  /* ============================================================
+     LAYOUT SHELL
+     ============================================================ */
+  #app{
+    max-width:640px;
+    margin:0 auto;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+  }
+
+  .topbar{
+    position:sticky; top:0; z-index:10;
+    background:color-mix(in srgb, var(--paper) 88%, transparent);
+    backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px);
+    padding:calc(var(--safe-top) + 20px) 18px 12px;
+    box-shadow:0 1px 0 var(--line);
+  }
+  .topbar-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    min-height:36px;
+  }
+  .topbar-row-2{
+    display:flex;
+    align-items:center;
+    justify-content:flex-start;
+    gap:8px;
+    margin-top:10px;
+  }
+  .icon-btn{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    width:34px; height:34px;
+    border:1px solid var(--line);
+    background:var(--surface);
+    border-radius:50%;
+    cursor:pointer;
+    color:var(--ink);
+    box-shadow:var(--shadow-1);
+    flex:none;
+    padding:0;
+    transition:transform .12s ease, background .2s ease;
+  }
+  .icon-btn:active{ transform:scale(.92); }
+  .icon-btn svg{ width:16px; height:16px; }
+
+  .back-btn{ display:none; }
+  .back-btn.visible{ display:flex; }
+
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    min-width:0;
+  }
+  .brand-badge{
+    width:36px; height:36px;
+    border-radius:11px;
+    background:linear-gradient(155deg, var(--primary-bright), var(--primary-deep));
+    color:#fff;
+    display:flex; align-items:center; justify-content:center;
+    flex:none;
+    box-shadow:0 4px 10px -3px color-mix(in srgb, var(--primary) 60%, transparent);
+  }
+  .brand-badge svg{ width:19px; height:19px; }
+
+  .brand-text{ min-width:0; }
+  .eyebrow{
+    font-size:0.7188rem;
+    font-weight:700;
+    color:var(--ink-faint);
+    letter-spacing:.02em;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .topbar h1{
+    font-size:1.0312rem;
+    font-weight:800;
+    line-height:1.35;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+
+
+  main{
+    flex:1;
+    padding:18px 18px calc(30px + var(--safe-bottom));
+  }
+
+  /* ============================================================
+     VIEW TRANSITION
+     ============================================================ */
+  .view-enter{ animation:viewIn .25s cubic-bezier(.2,.8,.3,1) both; }
+  @keyframes viewIn{
+    from{ opacity:0; transform:translateY(8px); }
+    to{ opacity:1; transform:translateY(0); }
+  }
+
+  /* ============================================================
+     HOME — HERO / SEARCH
+     ============================================================ */
+  .hero{
+    position:relative;
+    border-radius:var(--radius-l);
+    padding:22px 20px;
+    margin-bottom:18px;
+    overflow:hidden;
+    background:
+      radial-gradient(120% 140% at 100% 0%, color-mix(in srgb, var(--primary) 22%, transparent), transparent 60%),
+      linear-gradient(165deg, color-mix(in srgb, var(--primary) 10%, var(--surface)), var(--surface));
+    border:1px solid var(--line);
+    box-shadow:var(--shadow-1);
+  }
+  .hero h2{
+    font-size:1.25rem;
+    font-weight:900;
+    line-height:1.5;
+    letter-spacing:-.01em;
+  }
+  .hero p{
+    font-size:0.8125rem;
+    color:var(--ink-soft);
+    line-height:1.85;
+    margin-top:7px;
+    max-width:42ch;
+  }
+  .hero-stats{
+    display:flex;
+    gap:14px;
+    margin-top:14px;
+    font-size:0.75rem;
+    font-weight:700;
+    color:var(--primary-deep);
+  }
+  .hero-stats span{ display:flex; align-items:center; gap:5px; }
+  .hero-stats .n{ font-size:0.875rem; font-variant-numeric:tabular-nums; }
+
+  .search-wrap{
+    position:relative;
+    margin-top:16px;
+  }
+  .search-wrap svg.icon{
+    position:absolute;
+    top:50%; right:14px;
+    transform:translateY(-50%);
+    width:16px; height:16px;
+    color:var(--ink-faint);
+    pointer-events:none;
+  }
+  #searchInput{
+    width:100%;
+    height:46px;
+    border-radius:var(--radius-m);
+    border:1px solid var(--line);
+    background:var(--surface);
+    color:var(--ink);
+    padding:0 42px 0 40px;
+    font-size:0.875rem;
+    font-weight:600;
+    box-shadow:var(--shadow-1);
+  }
+  #searchInput::placeholder{ color:var(--ink-faint); font-weight:500; }
+  .search-clear{
+    position:absolute;
+    top:50%; left:8px;
+    transform:translateY(-50%);
+    width:26px; height:26px;
+    border:none;
+    border-radius:50%;
+    background:var(--surface-sunken);
+    color:var(--ink-soft);
+    display:none;
+    align-items:center; justify-content:center;
+    cursor:pointer;
+  }
+  .search-clear.visible{ display:flex; }
+  .search-clear svg{ width:12px; height:12px; }
+
+  /* ============================================================
+     CATEGORY CARDS
+     ============================================================ */
+  .section-label{
+    font-size:0.75rem;
+    font-weight:700;
+    color:var(--ink-faint);
+    margin:0 2px 10px;
+  }
+  .cat-list{ display:flex; flex-direction:column; gap:10px; }
+
+  .cat-card{
+    --tab: var(--primary);
+    width:100%;
+    display:flex;
+    align-items:center;
+    gap:13px;
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:var(--radius-m);
+    padding:13px 14px;
+    box-shadow:var(--shadow-1);
+    cursor:pointer;
+    text-align:right;
+    position:relative;
+    transition:transform .15s ease, box-shadow .2s ease, border-color .2s ease;
+  }
+  .cat-card:active{ transform:scale(.985); }
+  @media (hover:hover){
+    .cat-card:hover{ box-shadow:var(--shadow-2); border-color:color-mix(in srgb, var(--tab) 35%, var(--line)); }
+  }
+
+  .cat-icon{
+    width:42px; height:42px;
+    border-radius:13px;
+    flex:none;
+    display:flex; align-items:center; justify-content:center;
+    background:color-mix(in srgb, var(--tab) 15%, var(--mixbase));
+    color:var(--tab);
+  }
+  .cat-icon svg{ width:21px; height:21px; }
+
+  .cat-body{ flex:1; min-width:0; }
+  .cat-name{ font-size:0.9062rem; font-weight:700; line-height:1.45; }
+  .cat-count{ font-size:0.75rem; color:var(--ink-faint); margin-top:3px; font-weight:600; }
+  .cat-chev{ flex:none; color:var(--ink-faint); }
+  .cat-chev svg{ width:16px; height:16px; display:block; }
+
+  /* ============================================================
+     CATEGORY PAGE — PILL HEADER + DISEASE ROWS
+     ============================================================ */
+  .cat-pill{
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+    background:color-mix(in srgb, var(--pill, var(--primary-deep)) 14%, var(--mixbase));
+    color:var(--pill, var(--primary-deep));
+    border-radius:999px;
+    padding:4px 12px 4px 10px;
+    font-size:0.7188rem;
+    font-weight:700;
+  }
+  .cat-pill .dot{ width:6px; height:6px; border-radius:50%; background:var(--pill, var(--primary)); }
+
+  .disease-list{ display:flex; flex-direction:column; gap:9px; margin-top:16px; }
+  .disease-row{
+    width:100%;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:var(--radius-m);
+    padding:15px 16px;
+    cursor:pointer;
+    text-align:right;
+    font-size:0.875rem;
+    font-weight:700;
+    color:var(--ink);
+    box-shadow:var(--shadow-1);
+    transition:transform .12s ease, background .15s ease;
+  }
+  .disease-row:active{ transform:scale(.985); background:var(--surface-sunken); }
+  .disease-row svg{ width:15px; height:15px; color:var(--ink-faint); flex:none; }
+  .disease-row .tag{
+    font-size:0.6875rem;
+    font-weight:700;
+    color:var(--rowtag, var(--ink-faint));
+    background:color-mix(in srgb, var(--rowtag, var(--ink-faint)) 14%, var(--mixbase));
+    border-radius:7px;
+    padding:2px 7px;
+    margin-inline-start:8px;
+    flex:none;
+  }
+  .disease-row .rt{ display:flex; align-items:center; min-width:0; }
+  .disease-row .name{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+  .empty-search{
+    text-align:center;
+    padding:40px 20px;
+    color:var(--ink-soft);
+  }
+  .empty-search svg{ width:32px; height:32px; color:var(--ink-faint); margin-bottom:10px; }
+  .empty-search .t{ font-size:0.875rem; font-weight:700; color:var(--ink); margin-bottom:4px; }
+  .empty-search .d{ font-size:0.7812rem; line-height:1.8; }
+
+  /* ============================================================
+     DISEASE DETAIL — SEGMENTED TABS
+     ============================================================ */
+  .disease-head{ margin-bottom:16px; }
+  .disease-head h2{ font-size:1.25rem; font-weight:900; margin-top:9px; letter-spacing:-.01em; }
+
+  .tabs{
+    display:flex;
+    background:var(--surface-sunken);
+    border-radius:13px;
+    padding:4px;
+    gap:4px;
+    margin-bottom:16px;
+  }
+  .tab-btn{
+    flex:1;
+    border:none;
+    background:transparent;
+    padding:10px 6px;
+    font-size:0.7812rem;
+    font-weight:700;
+    color:var(--ink-soft);
+    border-radius:10px;
+    cursor:pointer;
+    transition:background .15s ease, color .15s ease;
+  }
+  .tab-btn.active{
+    background:var(--surface);
+    color:var(--catcolor, var(--primary-deep));
+    box-shadow:var(--shadow-1);
+  }
+
+  .panel{ display:none; }
+  .panel.active{ display:block; animation:viewIn .18s ease both; }
+
+  .empty-state{
+    border:1.5px dashed var(--line);
+    border-radius:var(--radius-m);
+    background:var(--surface);
+    padding:36px 20px;
+    text-align:center;
+    color:var(--ink-soft);
+  }
+  .empty-state svg{ width:30px; height:30px; color:var(--ink-faint); margin-bottom:10px; }
+  .empty-state .t{ font-size:0.875rem; font-weight:700; color:var(--ink); margin-bottom:4px; }
+  .empty-state .d{ font-size:0.7812rem; line-height:1.8; max-width:34ch; margin:0 auto; }
+
+  .panel p{ font-size:0.875rem; line-height:1.95; margin:0 0 12px; color:var(--ink); }
+  .panel img{ max-width:100%; height:auto; border-radius:12px; margin:6px 0 14px; display:block; box-shadow:var(--shadow-1); }
+  .panel strong{ font-weight:700; color:var(--catcolor, var(--primary-deep)); }
+  .panel ul{ padding-inline-start:20px; margin:0 0 12px; }
+  .panel li{ font-size:0.875rem; line-height:1.9; margin-bottom:8px; list-style:disc; }
+  .panel > div:not(.empty-state):not(.attach-share-row){
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:var(--radius-m);
+    padding:18px;
+    box-shadow:var(--shadow-1);
+  }
+
+  .dl-btn{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    background:var(--surface-sunken);
+    border:1px solid var(--line);
+    border-radius:var(--radius-s);
+    padding:13px 14px;
+    text-decoration:none;
+    color:var(--ink);
+    margin-top:6px;
+  }
+  .dl-btn:active{ transform:scale(.98); }
+  .dl-icon{
+    width:40px; height:40px;
+    border-radius:11px;
+    flex:none;
+    display:flex; align-items:center; justify-content:center;
+    background:color-mix(in srgb, var(--catcolor, var(--primary)) 15%, var(--mixbase));
+    color:var(--catcolor, var(--primary));
+  }
+  .dl-icon svg{ width:19px; height:19px; }
+  .dl-text{ flex:1; min-width:0; }
+  .dl-title{ display:block; font-size:0.875rem; font-weight:700; }
+  .dl-sub{ display:block; font-size:0.75rem; color:var(--ink-faint); margin-top:2px; }
+  .dl-arrow{ flex:none; color:var(--ink-faint); }
+  .dl-arrow svg{ width:15px; height:15px; }
+
+  .tab-btn{ display:flex; flex-direction:column; align-items:center; gap:4px; }
+  .tab-btn svg{ width:17px; height:17px; }
+
+  /* ============================================================
+     SETTINGS SHEET
+     ============================================================ */
+  .sheet-overlay{
+    position:fixed; inset:0;
+    background:rgba(10,14,16,.45);
+    z-index:50;
+    display:none;
+    align-items:flex-end;
+    justify-content:center;
+  }
+  .sheet-overlay.open{ display:flex; }
+  .sheet-overlay.open .sheet{ animation:sheetUp .25s cubic-bezier(.2,.8,.3,1) both; }
+  @keyframes sheetUp{ from{ transform:translateY(100%); } to{ transform:translateY(0); } }
+
+  .sheet{
+    width:100%;
+    max-width:640px;
+    max-height:88vh;
+    overflow-y:auto;
+    background:var(--paper);
+    border-radius:22px 22px 0 0;
+    padding:10px 20px calc(24px + var(--safe-bottom));
+    box-shadow:0 -10px 30px rgba(0,0,0,.25);
+  }
+  .sheet-handle{
+    width:38px; height:4px;
+    background:var(--line);
+    border-radius:99px;
+    margin:4px auto 14px;
+  }
+  .sheet-head{
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:18px;
+  }
+  .sheet-head h3{ font-size:1.0625rem; font-weight:800; }
+
+  .sheet-section{ margin-bottom:22px; }
+  .sheet-label{
+    font-size:0.75rem;
+    font-weight:700;
+    color:var(--ink-faint);
+    margin-bottom:10px;
+  }
+
+  .seg2{
+    display:flex;
+    background:var(--surface-sunken);
+    border-radius:12px;
+    padding:4px;
+    gap:4px;
+  }
+  .seg-btn{
+    flex:1;
+    padding:11px 6px;
+    border-radius:9px;
+    font-size:0.8125rem;
+    font-weight:700;
+    color:var(--ink-soft);
+    display:flex; align-items:center; justify-content:center; gap:6px;
+  }
+  .seg-btn svg{ width:15px; height:15px; }
+  .seg-btn.active{ background:var(--surface); color:var(--ink); box-shadow:var(--shadow-1); }
+
+  .swatch-row{ display:flex; gap:12px; }
+  .swatch{
+    width:38px; height:38px;
+    border-radius:50%;
+    background:var(--sw);
+    border:2.5px solid transparent;
+    position:relative;
+    box-shadow:var(--shadow-1);
+  }
+  .swatch.active{ border-color:var(--ink); }
+  .swatch.active::after{
+    content:"";
+    position:absolute; inset:0; margin:auto;
+    width:8px; height:8px; border-radius:50%;
+    background:#fff;
+  }
+
+  .opt-list{ display:flex; flex-direction:column; gap:8px; }
+  .opt-btn{
+    display:flex; align-items:center; justify-content:space-between;
+    width:100%;
+    padding:13px 14px;
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:var(--radius-s);
+    font-size:0.875rem;
+    font-weight:600;
+    color:var(--ink);
+  }
+  .opt-btn.active{ border-color:var(--primary); color:var(--primary-deep); font-weight:700; }
+  .opt-btn .ck{ width:16px; height:16px; color:var(--primary); visibility:hidden; }
+  .opt-btn.active .ck{ visibility:visible; }
+
+  .size-stepper{ display:flex; align-items:center; gap:14px; }
+  .size-stepper .icon-btn{ font-size:1.0625rem; font-weight:800; }
+  .size-track{ flex:1; display:flex; justify-content:space-between; align-items:center; padding:0 4px; }
+  .size-track .dot{ width:8px; height:8px; border-radius:50%; background:var(--line); }
+  .size-track .dot.active{ background:var(--primary); width:10px; height:10px; }
+  .size-preview{
+    margin-top:12px;
+    text-align:center;
+    font-size:0.875rem;
+    font-weight:600;
+    color:var(--ink-soft);
+    background:var(--surface-sunken);
+    border-radius:var(--radius-s);
+    padding:12px;
+  }
+
+  .reset-btn{
+    width:100%;
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    margin-top:6px;
+    padding:12px;
+    border-radius:var(--radius-s);
+    border:1px dashed var(--line);
+    background:transparent;
+    color:var(--ink-faint);
+    font-size:0.8125rem;
+    font-weight:700;
+  }
+  .reset-btn:active{ background:var(--surface-sunken); color:var(--ink-soft); }
+  .reset-btn svg{ width:15px; height:15px; }
+
+  /* ============================================================
+     SCROLL TO TOP + FLOATING SHARE
+     ============================================================ */
+  .top-fab{
+    position:fixed;
+    left:18px;
+    bottom:calc(38px + var(--safe-bottom));
+    width:44px; height:44px;
+    border-radius:50%;
+    background:var(--primary);
+    color:#fff;
+    border:none;
+    box-shadow:var(--shadow-2);
+    display:flex; align-items:center; justify-content:center;
+    z-index:20;
+    opacity:0; transform:translateY(10px);
+    pointer-events:none;
+    transition:opacity .2s ease, transform .2s ease;
+  }
+  .top-fab.visible{ opacity:1; transform:translateY(0); pointer-events:auto; }
+  .top-fab svg{ width:19px; height:19px; }
+
+  .share-fab{
+    position:fixed;
+    right:18px;
+    bottom:calc(38px + var(--safe-bottom));
+    width:48px; height:48px;
+    border-radius:50%;
+    background:var(--surface);
+    color:var(--primary-deep);
+    border:1px solid var(--line);
+    box-shadow:var(--shadow-2);
+    display:flex; align-items:center; justify-content:center;
+    z-index:20;
+    opacity:0; transform:translateY(10px);
+    pointer-events:none;
+    transition:opacity .2s ease, transform .2s ease;
+  }
+  .share-fab.visible{ opacity:1; transform:translateY(0); pointer-events:auto; }
+  .share-fab svg{ width:20px; height:20px; }
+
+  .share-menu-list{ display:flex; flex-direction:column; gap:8px; }
+  .share-menu-item{
+    display:flex; align-items:center; gap:12px;
+    width:100%; padding:14px 16px;
+    background:var(--surface-sunken);
+    border:1px solid var(--line);
+    border-radius:var(--radius-m);
+    font-size:0.875rem; font-weight:700; color:var(--ink);
+  }
+  .share-menu-item:active{ background:var(--surface); }
+  .share-menu-item .smi-icon{
+    width:36px; height:36px; border-radius:10px; flex:none;
+    display:flex; align-items:center; justify-content:center;
+    background:var(--primary-tint, color-mix(in srgb, var(--primary) 15%, var(--mixbase)));
+    color:var(--primary-deep);
+  }
+  .share-menu-item .smi-icon svg{ width:17px; height:17px; }
+
+  /* ============================================================
+     SHARE + COPY PROTECTION
+     ============================================================ */
+  .panel-protected{
+    -webkit-user-select:none; user-select:none;
+    -webkit-touch-callout:none;
+  }
+  .attach-share-row{
+    display:flex; align-items:center; gap:8px; margin-top:6px;
+  }
+  .attach-share-row .dl-btn{ flex:1; margin-top:0; }
+  .attach-share-btn{
+    flex:none;
+    width:44px; height:44px;
+    border-radius:var(--radius-s);
+    background:var(--surface-sunken);
+    border:1px solid var(--line);
+    color:var(--ink-soft);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .attach-share-btn:active{ background:var(--surface); }
+  .attach-share-btn svg{ width:16px; height:16px; }
+
+  .toast{
+    position:fixed;
+    left:50%; bottom:calc(26px + var(--safe-bottom));
+    transform:translateX(-50%) translateY(10px);
+    background:var(--ink);
+    color:var(--paper);
+    font-size:0.8125rem;
+    font-weight:600;
+    padding:11px 18px;
+    border-radius:99px;
+    box-shadow:var(--shadow-2);
+    z-index:60;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .2s ease, transform .2s ease;
+    white-space:nowrap;
+  }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+
+  /* ============================================================
+     HOME FOOTER / CONTACT
+     ============================================================ */
+  .home-footer{
+    margin-top:22px;
+    width:100%;
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    padding:14px;
+    border-radius:var(--radius-m);
+    background:var(--surface);
+    border:1px solid var(--line);
+    color:var(--ink-soft);
+    font-size:0.8125rem;
+    font-weight:700;
+  }
+  .home-footer svg{ width:15px; height:15px; }
+
+  .contact-list{ display:flex; flex-direction:column; gap:8px; margin-top:6px; }
+  .contact-row{
+    display:flex; align-items:center; gap:11px;
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:var(--radius-m);
+    padding:11px 13px;
+    box-shadow:var(--shadow-1);
+    text-decoration:none;
+    color:var(--ink);
+  }
+  .contact-row:active{ background:var(--surface-sunken); }
+  .contact-icon{
+    width:32px; height:32px; border-radius:10px; flex:none;
+    display:flex; align-items:center; justify-content:center;
+    background:var(--primary-tint, color-mix(in srgb, var(--primary) 15%, var(--mixbase)));
+    color:var(--primary);
+  }
+  .contact-icon svg{ width:15px; height:15px; }
+  .contact-text{ flex:1; min-width:0; }
+  .contact-label{ font-size:0.6875rem; color:var(--ink-faint); font-weight:600; }
+  .contact-value{ font-size:0.8125rem; font-weight:700; margin-top:1px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .contact-row > svg{ width:14px; height:14px; color:var(--ink-faint); flex:none; }
+
+  .dev-credit{
+    margin-top:14px;
+    text-align:center;
+    font-size:0.6875rem;
+    color:var(--ink-faint);
+    line-height:1.9;
+    padding:0 10px;
+  }
+</style>
+</head>
+<body>
+
+<div id="app">
+  <header class="topbar">
+    <div class="topbar-row">
+      <button class="icon-btn back-btn" id="backBtn" aria-label="بازگشت">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+      <div class="brand" id="brandHead">
+        <div class="brand-badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M4 12c0-2 1-3 3-3h10c2 0 3 1 3 3s-1 3-3 3H7c-2 0-3 1-3 3"/></svg>
+        </div>
+        <div class="brand-text">
+          <div class="eyebrow" id="headEyebrow">نظام مراقبت بیماری‌ها</div>
+          <h1 id="headTitle">کتابخانه دیجیتال</h1>
+        </div>
+      </div>
+    </div>
+    <div class="topbar-row-2">
+      <button class="icon-btn" id="searchBtn" aria-label="جستجو">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      </button>
+      <button class="icon-btn" id="settingsBtn" aria-label="تنظیمات نمایش">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="7" x2="20" y2="7"/><circle cx="14" cy="7" r="2.3"/><line x1="4" y1="17" x2="20" y2="17"/><circle cx="10" cy="17" r="2.3"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main id="view" tabindex="-1"></main>
+</div>
+
+<div class="sheet-overlay" id="shareMenuOverlay">
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="shareMenuTitle" style="max-width:420px">
+    <div class="sheet-handle"></div>
+    <div class="sheet-head">
+      <h3 id="shareMenuTitle">اشتراک‌گذاری</h3>
+      <button class="icon-btn" id="shareMenuClose" aria-label="بستن">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+    <div class="share-menu-list" id="shareMenuList">
+      <button class="share-menu-item" data-target="telegram">
+        <span class="smi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 4L3 11l6 2.5M21 4l-7.5 16-4.5-7.5M21 4L9.5 13.5"/></svg></span>
+        اشتراک‌گذاری در تلگرام
+      </button>
+      <button class="share-menu-item" data-target="bale">
+        <span class="smi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5L16 9.5"/></svg></span>
+        اشتراک‌گذاری در بله
+      </button>
+      <button class="share-menu-item" data-target="copy">
+        <span class="smi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 012-2h10"/></svg></span>
+        کپی در کلیپ‌بورد
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="sheet-overlay" id="sheetOverlay">
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+    <div class="sheet-handle"></div>
+    <div class="sheet-head">
+      <h3 id="sheetTitle">تنظیمات نمایش</h3>
+      <button class="icon-btn" id="sheetClose" aria-label="بستن">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+
+    <div class="sheet-section">
+      <div class="sheet-label">حالت نمایش</div>
+      <div class="seg2" id="modeSeg">
+        <button class="seg-btn" data-mode="light">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4 12H2M22 12h-2M5 5l1.4 1.4M17.6 17.6L19 19M19 5l-1.4 1.4M6.4 17.6L5 19"/></svg>
+          روز
+        </button>
+        <button class="seg-btn" data-mode="dark">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5z"/></svg>
+          شب
+        </button>
+      </div>
+    </div>
+
+    <div class="sheet-section">
+      <div class="sheet-label">تم رنگی</div>
+      <div class="swatch-row" id="colorSwatches">
+        <button class="swatch" data-color="teal" style="--sw:#0E6E66" aria-label="تیل"></button>
+        <button class="swatch" data-color="blue" style="--sw:#1E5FA8" aria-label="آبی"></button>
+        <button class="swatch" data-color="plum" style="--sw:#7A3B69" aria-label="بنفش"></button>
+        <button class="swatch" data-color="forest" style="--sw:#3E6B3A" aria-label="زیتونی"></button>
+      </div>
+    </div>
+
+    <div class="sheet-section">
+      <div class="sheet-label">فونت</div>
+      <div class="opt-list" id="fontOpts">
+        <button class="opt-btn" data-font="vazir">
+          Vazirmatn
+          <svg class="ck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
+        </button>
+        <button class="opt-btn" data-font="yekan">
+          B Yekan
+          <svg class="ck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
+        </button>
+        <button class="opt-btn" data-font="nazanin">
+          B Nazanin
+          <svg class="ck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="sheet-section">
+      <div class="sheet-label">اندازه متن</div>
+      <div class="size-stepper">
+        <button class="icon-btn" id="sizeDec" aria-label="کوچک‌تر">−</button>
+        <div class="size-track" id="sizeTrack">
+          <span class="dot" data-i="0"></span><span class="dot" data-i="1"></span><span class="dot" data-i="2"></span><span class="dot" data-i="3"></span>
+        </div>
+        <button class="icon-btn" id="sizeInc" aria-label="بزرگ‌تر">+</button>
+      </div>
+      <div class="size-preview" id="sizePreview">نمونه‌ی متن — کتابخانه نظام مراقبت بیماری‌ها</div>
+    </div>
+
+    <button class="reset-btn" id="resetSettingsBtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>
+      بازگشت به حالت پیش‌فرض
+    </button>
+  </div>
+</div>
+
+<script src="content.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

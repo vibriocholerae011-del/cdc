@@ -124,12 +124,41 @@
     toastTimer = setTimeout(()=> toastEl.classList.remove('show'), 2200);
   }
 
-  /* ---------- analytics (GoatCounter) ---------- */
+  /* ---------- analytics (GoatCounter) ----------
+     The script loads async, so it may not be ready the instant the app
+     opens — exactly when the most important "someone opened the bot"
+     pageview happens. Queue calls until it's actually ready, then flush
+     in order, instead of silently dropping early ones. */
+  let gcReady = false;
+  let gcQueue = [];
+  function gcFlush(){
+    if (gcReady) return;
+    if (!(window.goatcounter && typeof window.goatcounter.count === 'function')) return;
+    gcReady = true;
+    const q = gcQueue; gcQueue = [];
+    q.forEach(opts => { try{ window.goatcounter.count(opts); }catch(e){} });
+  }
   function gcCount(opts){
-    if (window.goatcounter && typeof window.goatcounter.count === 'function'){
+    if (gcReady && window.goatcounter && typeof window.goatcounter.count === 'function'){
       try{ window.goatcounter.count(opts); }catch(e){}
+    } else {
+      gcQueue.push(opts);
+      gcFlush(); // in case the script finished loading between calls without us noticing
     }
   }
+  (function watchGcScript(){
+    const s = document.getElementById('gcScript');
+    if (s) s.addEventListener('load', gcFlush);
+    // fallback in case the script was already cached/loaded before this ran, or the
+    // load event is ever missed for some reason — check a few times early on.
+    let tries = 0;
+    const timer = setInterval(() => {
+      tries++;
+      gcFlush();
+      if (gcReady || tries > 20) clearInterval(timer);
+    }, 250);
+  })();
+
   function trackPageview(state){
     let path = '/' + (state.view || 'home');
     let title = SITE_CONFIG.title;
@@ -714,6 +743,15 @@
     if (e.target.closest && e.target.closest('.panel-protected')) e.preventDefault();
   });
 
+  function trackNewUserOnce(){
+    try{
+      if (localStorage.getItem('cdc_seen_device')) return;
+      localStorage.setItem('cdc_seen_device', '1');
+    }catch(e){ return; } // storage unavailable (private mode etc.) — skip rather than risk double-counting every load
+    gcCount({ path: 'new-user', title: 'کاربر جدید (اولین بازدید این دستگاه)', event: true });
+  }
+
   history.replaceState({view:'home'}, '', '#home');
   render({view:'home'});
+  trackNewUserOnce();
 })();
