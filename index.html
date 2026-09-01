@@ -266,6 +266,16 @@
   /* ============================================================
      CATEGORY CARDS
      ============================================================ */
+  .home-section{ margin-bottom:26px; }
+  .home-section-head{
+    display:flex; align-items:center; gap:8px;
+    margin:0 2px 10px;
+  }
+  .home-section-head h3{
+    font-size:0.8125rem; font-weight:800; color:var(--ink-soft);
+  }
+  .home-section-head .line{ flex:1; height:1px; background:var(--line); }
+
   .section-label{
     font-size:0.75rem;
     font-weight:700;
@@ -273,6 +283,80 @@
     margin:0 2px 10px;
   }
   .cat-list{ display:flex; flex-direction:column; gap:10px; }
+
+  /* ---- ابزارها ---- */
+  .tool-topic-card{
+    --tab: var(--primary);
+    width:100%; display:flex; align-items:center; gap:13px;
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-m);
+    padding:13px 14px; box-shadow:var(--shadow-1); cursor:pointer; text-align:right;
+  }
+  .tool-topic-card:active{ transform:scale(.985); }
+  .tool-list{ display:flex; flex-direction:column; gap:9px; margin-top:14px; }
+  .tool-row{
+    width:100%; display:flex; align-items:center; gap:13px;
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-m);
+    padding:14px 15px; box-shadow:var(--shadow-1); text-align:right;
+  }
+  .tool-row.disabled{ opacity:.55; }
+  .tool-row-body{ flex:1; min-width:0; }
+  .tool-row-title{ font-size:0.875rem; font-weight:700; }
+  .tool-row-desc{ font-size:0.75rem; color:var(--ink-faint); margin-top:3px; line-height:1.7; }
+  .tool-row-badge{
+    font-size:0.6875rem; font-weight:700; color:var(--amber);
+    background:rgba(184,99,30,.12); border-radius:7px; padding:3px 8px; flex:none;
+  }
+
+  /* ---- ابزار محاسبه‌گر: انتخاب واریانت + تاریخ شمسی ---- */
+  .tool-card{
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-m);
+    padding:18px; box-shadow:var(--shadow-1); margin-bottom:14px;
+  }
+  .tool-card h3{ font-size:0.875rem; font-weight:800; margin-bottom:12px; }
+  .variant-seg{
+    display:flex; background:var(--surface-sunken); border-radius:12px; padding:4px; gap:4px;
+  }
+  .variant-seg button{
+    flex:1; border:none; background:transparent; padding:11px 6px; border-radius:9px;
+    font-size:0.8125rem; font-weight:700; color:var(--ink-soft);
+  }
+  .variant-seg button.active{ background:var(--surface); color:var(--primary-deep); box-shadow:var(--shadow-1); }
+
+  .date-picker{ display:flex; gap:8px; }
+  .date-picker select{
+    flex:1; height:44px; border-radius:10px; border:1px solid var(--line);
+    background:var(--surface-sunken); color:var(--ink); font-size:0.8125rem; text-align:center;
+    -webkit-appearance:none; appearance:none;
+  }
+  .date-toggle{
+    display:flex; background:var(--surface-sunken); border-radius:12px; padding:4px; gap:4px; margin-bottom:10px;
+  }
+  .date-toggle button{
+    flex:1; border:none; background:transparent; padding:9px 6px; border-radius:9px;
+    font-size:0.75rem; font-weight:700; color:var(--ink-soft);
+  }
+  .date-toggle button.active{ background:var(--surface); color:var(--primary-deep); box-shadow:var(--shadow-1); }
+
+  .age-result{
+    text-align:center; background:var(--primary-tint, color-mix(in srgb, var(--primary) 12%, var(--mixbase)));
+    border-radius:var(--radius-m); padding:14px; margin:14px 0; font-weight:700; color:var(--primary-deep);
+    font-size:0.875rem;
+  }
+  .schedule-row{
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-m);
+    padding:14px 15px; margin-bottom:10px; box-shadow:var(--shadow-1);
+  }
+  .schedule-row-age{
+    font-size:0.75rem; font-weight:800; color:var(--primary-deep); margin-bottom:8px;
+    display:flex; align-items:center; gap:6px;
+  }
+  .schedule-row-age::before{ content:""; width:7px; height:7px; border-radius:50%; background:var(--primary); }
+  .schedule-row ul{ padding-inline-start:20px; margin:0; }
+  .schedule-row li{ font-size:0.8125rem; line-height:1.9; }
+  .tool-error{
+    text-align:center; color:var(--red, #E0716A); background:rgba(224,113,106,.1);
+    border-radius:var(--radius-m); padding:14px; font-size:0.8125rem; font-weight:600;
+  }
 
   .cat-card{
     --tab: var(--primary);

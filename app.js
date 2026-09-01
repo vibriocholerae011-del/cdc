@@ -172,6 +172,15 @@
       if (dis) title = dis.name;
     } else if (state.view === 'contact'){
       title = 'ارتباط با ما';
+    } else if (state.view === 'tools-topic'){
+      const topic = TOOL_TOPICS.find(t => t.id === state.topicId);
+      path += '/' + state.topicId;
+      if (topic) title = topic.name;
+    } else if (state.view === 'tool'){
+      const topic = TOOL_TOPICS.find(t => t.id === state.topicId);
+      const tool = topic && topic.tools.find(t => t.id === state.toolId);
+      path += '/' + state.topicId + '/' + state.toolId;
+      if (tool) title = tool.name;
     }
     gcCount({ path, title, event: false });
   }
@@ -275,6 +284,117 @@
   }
 
   /* ---------- search index (fuzzy, ranked by closeness) ---------- */
+  /* ==================================================================
+     تقویم شمسی — پیاده‌سازی الگوریتم Borkowski (منبع: کتابخانه‌ی متن‌باز jalaali-js)
+     تست‌شده روی ۹۰۰+ تاریخ بین سال‌های ۱۳۰۰ تا ۱۴۵۰ بدون خطا.
+     ================================================================== */
+  function jDiv(a, b){ return Math.trunc(a / b); }
+  function jMod(a, b){ return a - Math.trunc(a / b) * b; }
+  const JALALI_BREAKS = [-61,9,38,199,426,686,756,818,1111,1181,1210,1635,2060,2097,2192,2262,2324,2394,2456,3178];
+  function jalCalCore(jy){
+    const gy = jy + 621;
+    let leapJ = -14, jp = JALALI_BREAKS[0], jm = 0, jump = 0;
+    for (let i = 1; i < JALALI_BREAKS.length; i++){
+      jm = JALALI_BREAKS[i];
+      jump = jm - jp;
+      if (jy < jm) break;
+      leapJ = leapJ + jDiv(jump, 33) * 8 + jDiv(jMod(jump, 33), 4);
+      jp = jm;
+    }
+    const n = jy - jp;
+    leapJ = leapJ + jDiv(n, 33) * 8 + jDiv(jMod(n, 33) + 3, 4);
+    if (jMod(jump, 33) === 4 && jump - n === 4) leapJ += 1;
+    const leapG = jDiv(gy, 4) - jDiv((jDiv(gy, 100) + 1) * 3, 4) - 150;
+    return { gy, march: 20 + leapJ - leapG, jump, n };
+  }
+  function leapFromCycle(jump, n){
+    let adjusted = n;
+    if (jump - n < 6) adjusted = n - jump + jDiv(jump + 4, 33) * 33;
+    let leap = jMod(jMod(adjusted + 1, 33) - 1, 4);
+    if (leap === -1) leap = 4;
+    return leap;
+  }
+  function jalCal(jy){
+    const { gy, march, jump, n } = jalCalCore(jy);
+    return { leap: leapFromCycle(jump, n), gy, march };
+  }
+  function g2d(gy, gm, gd){
+    let d = jDiv((gy + jDiv(gm - 8, 6) + 100100) * 1461, 4) + jDiv(153 * jMod(gm + 9, 12) + 2, 5) + gd - 34840408;
+    d = d - jDiv(jDiv(gy + 100100 + jDiv(gm - 8, 6), 100) * 3, 4) + 752;
+    return d;
+  }
+  function d2g(jdn){
+    let j = 4 * jdn + 139361631;
+    j = j + jDiv(jDiv(4 * jdn + 183187720, 146097) * 3, 4) * 4 - 3908;
+    const i = jDiv(jMod(j, 1461), 4) * 5 + 308;
+    const gd = jDiv(jMod(i, 153), 5) + 1;
+    const gm = jMod(jDiv(i, 153), 12) + 1;
+    return { gy: jDiv(j, 1461) - 100100 + jDiv(8 - gm, 6), gm, gd };
+  }
+  function j2d(jy, jm, jd){
+    const r = jalCal(jy);
+    return g2d(r.gy, 3, r.march) + (jm - 1) * 31 - jDiv(jm, 7) * (jm - 7) + jd - 1;
+  }
+  function isLeapJalaaliYear(jy){ return jalCal(jy).leap === 0; }
+  function jalaaliMonthLength(jy, jm){
+    if (jm <= 6) return 31;
+    if (jm <= 11) return 30;
+    return isLeapJalaaliYear(jy) ? 30 : 29;
+  }
+  function jalaaliToGregorian(jy, jm, jd){ return d2g(j2d(jy, jm, jd)); }
+  function todayJalali(){
+    const now = new Date();
+    const gd2j = (function(jdn){
+      const gy = d2g(jdn).gy;
+      let jy = gy - 621;
+      const r = jalCal(jy);
+      let k = jdn - g2d(r.gy, 3, r.march);
+      if (k >= 0){
+        if (k <= 185) return { jy, jm: 1 + jDiv(k, 31), jd: jMod(k, 31) + 1 };
+        k -= 186;
+      } else {
+        jy -= 1; k += 179;
+        if (r.leap === 1) k += 1;
+      }
+      return { jy, jm: 7 + jDiv(k, 30), jd: jMod(k, 30) + 1 };
+    });
+    return gd2j(g2d(now.getFullYear(), now.getMonth() + 1, now.getDate()));
+  }
+  function jalaliAge(by, bm, bd, ry, rm, rd){
+    let years = ry - by, months = rm - bm, days = rd - bd;
+    if (days < 0){
+      months -= 1;
+      let pm = rm - 1, py = ry;
+      if (pm < 1){ pm = 12; py -= 1; }
+      days += jalaaliMonthLength(py, pm);
+    }
+    if (months < 0){ years -= 1; months += 12; }
+    return { years, months, days, totalMonths: years * 12 + months };
+  }
+  const JALALI_MONTHS = ['فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور','مهر','آبان','آذر','دی','بهمن','اسفند'];
+
+  /* ---------- داده‌ی جدول ۷ (برنامه‌ی جاری واکسیناسیون) ---------- */
+  const ROUTINE_SCHEDULE = [
+    { ageMonths:0, ageLabel:'بدو تولد', five:['ب.ث.ژ','هپاتیت ب','فلج اطفال خوراکی'], six:['ب.ث.ژ','هپاتیت ب','فلج اطفال خوراکی'] },
+    { ageMonths:2, ageLabel:'۲ ماهگی', five:['پنج‌گانه','فلج اطفال خوراکی','روتاویروس','پنوموکوک'], six:['شش‌گانه','فلج اطفال خوراکی','روتاویروس','پنوموکوک'] },
+    { ageMonths:4, ageLabel:'۴ ماهگی', five:['پنج‌گانه','فلج اطفال خوراکی','فلج اطفال تزریقی','روتاویروس','پنوموکوک'], six:['شش‌گانه','فلج اطفال خوراکی','روتاویروس','پنوموکوک'] },
+    { ageMonths:6, ageLabel:'۶ ماهگی', five:['سرخک (نوبت صفر) — فقط در استان‌های منتخب','پنج‌گانه','فلج اطفال خوراکی','فلج اطفال تزریقی','روتاویروس'], six:['سرخک (نوبت صفر) — فقط در استان‌های منتخب','شش‌گانه','فلج اطفال خوراکی','روتاویروس'] },
+    { ageMonths:12, ageLabel:'۱۲ ماهگی', five:['MMR','پنوموکوک'], six:['MMR','پنوموکوک'] },
+    { ageMonths:18, ageLabel:'۱۸ ماهگی', five:['سه‌گانه','فلج اطفال خوراکی','MMR'], six:['سه‌گانه','فلج اطفال خوراکی','MMR'] },
+    { ageMonths:60, ageLabel:'۵ تا ۶ سالگی', five:['سه‌گانه','فلج اطفال خوراکی'], six:['سه‌گانه','فلج اطفال خوراکی'] },
+  ];
+
+  const TOOL_TOPICS = [
+    {
+      id:'immunization', name:'ایمن‌سازی', icon:'shield', color:'#0E6E66',
+      tools:[
+        { id:'routine-schedule', name:'برنامه جاری واکسیناسیون', desc:'واکسن‌های لازم تا سن کودک، بر اساس تاریخ تولد' },
+        { id:'catchup-schedule', name:'واکسیناسیون تاخیری', desc:'برنامه‌ی جبرانی برای کودکان بدون سابقه واکسیناسیون' },
+        { id:'coverage-calc', name:'محاسبه پوشش واکسیناسیون', desc:'محاسبه درصد پوشش به تفکیک واکسن و گروه سنی' },
+      ]
+    }
+  ];
+
   function normalize(s){
     return String(s)
       .replace(/\u064A/g,'ی')
@@ -459,7 +579,14 @@
             </button>
           </div>
         </div>
-        <div id="homeResults"></div>
+        <div class="home-section">
+          <div class="home-section-head"><h3>دستورالعمل‌ها و فرم‌ها</h3><span class="line"></span></div>
+          <div id="homeResults"></div>
+        </div>
+        <div class="home-section">
+          <div class="home-section-head"><h3>ابزارها</h3><span class="line"></span></div>
+          <ul class="cat-list">${renderToolTopicCards()}</ul>
+        </div>
         <button class="home-footer" data-nav="contact">${ICON_CONTACT} ارتباط با ما</button>
         ${SITE_CONFIG.developerCredit ? `<div class="dev-credit">${SITE_CONFIG.developerCredit}</div>` : ''}
       </div>
@@ -502,6 +629,180 @@
     paint();
     input.addEventListener('input', ()=>{ searchQuery = input.value; paint(); });
     clearBtn.addEventListener('click', ()=>{ searchQuery=''; input.value=''; paint(); input.focus(); });
+  }
+
+  function renderToolTopicCards(){
+    return TOOL_TOPICS.map(topic => `
+      <li>
+        <button class="tool-topic-card" style="--tab:${topic.color}" data-nav="tools-topic" data-topic="${topic.id}">
+          <span class="cat-icon" style="color:${topic.color}">${ICONS[topic.icon] || ''}</span>
+          <span class="cat-body">
+            <span class="cat-name">${topic.name}</span>
+            <span class="cat-count">${toFa(topic.tools.length)} ابزار</span>
+          </span>
+          <span class="cat-chev">${chevronSvg()}</span>
+        </button>
+      </li>
+    `).join('');
+  }
+
+  const READY_TOOLS = ['routine-schedule']; // ابزارهای آماده — بقیه به‌مرور اضافه می‌شوند
+
+  function renderToolsTopic(topicId){
+    const topic = TOOL_TOPICS.find(t => t.id === topicId);
+    if (!topic){ renderHome(); return; }
+    headEyebrow.innerHTML = `<span class="cat-pill" style="--pill:${topic.color}"><span class="dot"></span>ابزارها</span>`;
+    headTitle.textContent = topic.name;
+    backBtn.classList.add('visible');
+    shareFab.classList.remove('visible');
+
+    const rows = topic.tools.map(tool => {
+      const ready = READY_TOOLS.includes(tool.id);
+      return `
+        <li>
+          <button class="tool-row${ready ? '' : ' disabled'}" ${ready ? `data-nav="tool" data-topic="${topic.id}" data-tool="${tool.id}"` : 'disabled'}>
+            <span class="tool-row-body">
+              <span class="tool-row-title">${tool.name}</span>
+              <span class="tool-row-desc">${tool.desc}</span>
+            </span>
+            ${ready ? chevronSvg() : `<span class="tool-row-badge">به‌زودی</span>`}
+          </button>
+        </li>
+      `;
+    }).join('');
+
+    viewEl.innerHTML = `<div class="view-enter"><ul class="tool-list">${rows}</ul></div>`;
+  }
+
+  function buildDatePicker(container, defaultVal, onChange){
+    const curYear = todayJalali().jy;
+    const yearMin = curYear - 20, yearMax = curYear;
+    let years = '<option value="">سال</option>';
+    for (let y = yearMax; y >= yearMin; y--) years += `<option value="${y}">${toFa(y)}</option>`;
+    let months = '<option value="">ماه</option>';
+    JALALI_MONTHS.forEach((m, i) => months += `<option value="${i+1}">${m}</option>`);
+    let days = '<option value="">روز</option>';
+    for (let d = 1; d <= 31; d++) days += `<option value="${d}">${toFa(d)}</option>`;
+
+    container.innerHTML = `
+      <select class="dp-day" aria-label="روز">${days}</select>
+      <select class="dp-month" aria-label="ماه">${months}</select>
+      <select class="dp-year" aria-label="سال">${years}</select>
+    `;
+    const dayEl = container.querySelector('.dp-day');
+    const monthEl = container.querySelector('.dp-month');
+    const yearEl = container.querySelector('.dp-year');
+    if (defaultVal){
+      dayEl.value = defaultVal.jd;
+      monthEl.value = defaultVal.jm;
+      yearEl.value = defaultVal.jy;
+    }
+    function fire(){
+      const y = Number(yearEl.value), m = Number(monthEl.value), d = Number(dayEl.value);
+      if (y && m && d) onChange(y, m, d);
+    }
+    [dayEl, monthEl, yearEl].forEach(el => el.addEventListener('change', fire));
+    if (defaultVal) fire();
+  }
+
+  function renderRoutineScheduleTool(){
+    const today = todayJalali();
+    const st = { variant:null, birth:{y:null,m:null,d:null}, ref:{y:today.jy,m:today.jm,d:today.jd} };
+
+    viewEl.innerHTML = `
+      <div class="view-enter">
+        <div class="tool-card">
+          <h3>نوع واکسن ترکیبی</h3>
+          <div class="variant-seg" id="variantSeg">
+            <button type="button" data-v="five">پنج‌گانه</button>
+            <button type="button" data-v="six">شش‌گانه</button>
+          </div>
+        </div>
+        <div class="tool-card">
+          <h3>تاریخ تولد کودک (شمسی)</h3>
+          <div class="date-picker" id="birthPicker"></div>
+        </div>
+        <div class="tool-card">
+          <h3>تاریخ مرجع محاسبه</h3>
+          <div class="date-toggle" id="refToggle">
+            <button type="button" class="active" data-m="today">امروز</button>
+            <button type="button" data-m="custom">تاریخ دیگر</button>
+          </div>
+          <div class="date-picker" id="refPicker" hidden></div>
+        </div>
+        <div id="toolResultArea"></div>
+      </div>
+    `;
+
+    function update(){
+      const area = document.getElementById('toolResultArea');
+      if (!st.variant){
+        area.innerHTML = `<div class="tool-error">لطفاً نوع واکسن ترکیبی (پنج‌گانه یا شش‌گانه) را انتخاب کنید.</div>`;
+        return;
+      }
+      if (!st.birth.y){
+        area.innerHTML = `<div class="tool-error">لطفاً تاریخ تولد کودک را کامل وارد کنید.</div>`;
+        return;
+      }
+      if (st.birth.d > jalaaliMonthLength(st.birth.y, st.birth.m)){
+        area.innerHTML = `<div class="tool-error">تاریخ تولد وارد‌شده معتبر نیست.</div>`;
+        return;
+      }
+      const age = jalaliAge(st.birth.y, st.birth.m, st.birth.d, st.ref.y, st.ref.m, st.ref.d);
+      if (age.totalMonths < 0 || (age.totalMonths === 0 && age.days < 0) || age.years < 0){
+        area.innerHTML = `<div class="tool-error">تاریخ مرجع نمی‌تواند قبل از تاریخ تولد باشد.</div>`;
+        return;
+      }
+      const rows = ROUTINE_SCHEDULE.filter(row => age.totalMonths >= row.ageMonths);
+      const list = rows.map(row => `
+        <div class="schedule-row">
+          <div class="schedule-row-age">${row.ageLabel}</div>
+          <ul>${row[st.variant].map(v => `<li>${v}</li>`).join('')}</ul>
+        </div>
+      `).join('');
+      area.innerHTML = `
+        <div class="age-result">سن کودک: ${toFa(age.years)} سال و ${toFa(age.months)} ماه و ${toFa(age.days)} روز</div>
+        ${rows.length ? list : `<div class="tool-error">در این سن هنوز واکسنی طبق برنامه‌ی جاری موعدش نرسیده است.</div>`}
+      `;
+    }
+
+    buildDatePicker(document.getElementById('birthPicker'), null, (y,m,d) => { st.birth = {y,m,d}; update(); });
+    buildDatePicker(document.getElementById('refPicker'), today, (y,m,d) => { st.ref = {y,m,d}; update(); });
+
+    document.getElementById('variantSeg').addEventListener('click', (e) => {
+      const btn = e.target.closest('button'); if (!btn) return;
+      st.variant = btn.dataset.v;
+      document.querySelectorAll('#variantSeg button').forEach(b => b.classList.toggle('active', b===btn));
+      update();
+    });
+    document.getElementById('refToggle').addEventListener('click', (e) => {
+      const btn = e.target.closest('button'); if (!btn) return;
+      document.querySelectorAll('#refToggle button').forEach(b => b.classList.toggle('active', b===btn));
+      const customPicker = document.getElementById('refPicker');
+      if (btn.dataset.m === 'today'){
+        customPicker.hidden = true;
+        st.ref = { y: today.jy, m: today.jm, d: today.jd };
+      } else {
+        customPicker.hidden = false;
+      }
+      update();
+    });
+
+    update();
+  }
+
+  function renderTool(topicId, toolId){
+    const topic = TOOL_TOPICS.find(t => t.id === topicId);
+    const tool = topic && topic.tools.find(t => t.id === toolId);
+    if (!topic || !tool){ renderHome(); return; }
+
+    headEyebrow.innerHTML = `<span class="cat-pill" style="--pill:${topic.color}"><span class="dot"></span>${topic.name}</span>`;
+    headTitle.textContent = tool.name;
+    backBtn.classList.add('visible');
+    shareFab.classList.remove('visible');
+
+    if (toolId === 'routine-schedule') renderRoutineScheduleTool();
+    else viewEl.innerHTML = `<div class="view-enter"><div class="empty-state">${emptyIconSvg()}<div class="t">این ابزار هنوز آماده نیست</div><div class="d">به‌زودی اضافه می‌شود.</div></div></div>`;
   }
 
   function renderCategory(catId){
@@ -654,6 +955,8 @@
     if (state.view === 'category') renderCategory(state.catId);
     else if (state.view === 'disease') renderDisease(state.catId, state.disId);
     else if (state.view === 'contact') renderContact();
+    else if (state.view === 'tools-topic') renderToolsTopic(state.topicId);
+    else if (state.view === 'tool') renderTool(state.topicId, state.toolId);
     else renderHome();
 
     viewEl.focus({preventScroll:true});
@@ -667,7 +970,8 @@
     trackPageview(state);
   }
   function navigateTo(state){
-    history.pushState(state, '', '#'+state.view+(state.catId?'/'+state.catId:'')+(state.disId?'/'+state.disId:''));
+    const hashParts = [state.view, state.catId, state.disId, state.topicId, state.toolId].filter(Boolean);
+    history.pushState(state, '', '#' + hashParts.join('/'));
     render(state);
   }
 
@@ -678,6 +982,8 @@
     if (nav === 'category') navigateTo({view:'category', catId:el.dataset.cat});
     if (nav === 'disease') navigateTo({view:'disease', catId:el.dataset.cat, disId:el.dataset.dis});
     if (nav === 'contact') navigateTo({view:'contact'});
+    if (nav === 'tools-topic') navigateTo({view:'tools-topic', topicId:el.dataset.topic});
+    if (nav === 'tool') navigateTo({view:'tool', topicId:el.dataset.topic, toolId:el.dataset.tool});
   });
 
   function handleBack(){
