@@ -579,14 +579,9 @@
             </button>
           </div>
         </div>
-        <div class="home-section">
-          <div class="home-section-head"><h3>دستورالعمل‌ها و فرم‌ها</h3><span class="line"></span></div>
-          <div id="homeResults"></div>
-        </div>
-        <div class="home-section">
-          <div class="home-section-head"><h3>ابزارها</h3><span class="line"></span></div>
-          <ul class="cat-list">${renderToolTopicCards()}</ul>
-        </div>
+        <div class="tools-banner-wrap">${renderToolTopicBanners()}</div>
+        <div class="section-label" style="margin-top:4px">دستورالعمل‌ها و فرم‌ها</div>
+        <div id="homeResults"></div>
         <button class="home-footer" data-nav="contact">${ICON_CONTACT} ارتباط با ما</button>
         ${SITE_CONFIG.developerCredit ? `<div class="dev-credit">${SITE_CONFIG.developerCredit}</div>` : ''}
       </div>
@@ -631,18 +626,17 @@
     clearBtn.addEventListener('click', ()=>{ searchQuery=''; input.value=''; paint(); input.focus(); });
   }
 
-  function renderToolTopicCards(){
+  function renderToolTopicBanners(){
     return TOOL_TOPICS.map(topic => `
-      <li>
-        <button class="tool-topic-card" style="--tab:${topic.color}" data-nav="tools-topic" data-topic="${topic.id}">
-          <span class="cat-icon" style="color:${topic.color}">${ICONS[topic.icon] || ''}</span>
-          <span class="cat-body">
-            <span class="cat-name">${topic.name}</span>
-            <span class="cat-count">${toFa(topic.tools.length)} ابزار</span>
-          </span>
-          <span class="cat-chev">${chevronSvg()}</span>
-        </button>
-      </li>
+      <button class="tools-banner" data-nav="tools-topic" data-topic="${topic.id}">
+        <span class="tools-banner-icon" style="--tab:${topic.color}">${ICONS[topic.icon] || ''}</span>
+        <span class="tools-banner-text">
+          <span class="tools-banner-eyebrow">ابزارها</span>
+          <span class="tools-banner-title">${topic.name}</span>
+          <span class="tools-banner-desc">${toFa(topic.tools.length)} ابزار محاسبه‌گر و کاربردی</span>
+        </span>
+        <span class="cat-chev">${chevronSvg()}</span>
+      </button>
     `).join('');
   }
 
@@ -665,7 +659,7 @@
               <span class="tool-row-title">${tool.name}</span>
               <span class="tool-row-desc">${tool.desc}</span>
             </span>
-            ${ready ? chevronSvg() : `<span class="tool-row-badge">به‌زودی</span>`}
+            ${ready ? `<span class="cat-chev">${chevronSvg()}</span>` : `<span class="tool-row-badge">به‌زودی</span>`}
           </button>
         </li>
       `;
